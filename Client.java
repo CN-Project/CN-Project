@@ -1,3 +1,6 @@
+/**
+ * Created by xiyaoma on 10/19/17.
+ */
 import java.net.*;
 import java.io.*;
 import java.nio.*;
@@ -5,94 +8,106 @@ import java.nio.channels.*;
 import java.util.*;
 
 public class Client {
-	Socket requestSocket;           //socket connect to the server
-	ObjectOutputStream out;         //stream write to the socket
- 	ObjectInputStream in;          //stream read from the socket
-	String message;                //message send to the server
-	String MESSAGE;                //capitalized message read from the server
+    Socket requestSocket;
+    ObjectInputStream in;
+    ObjectOutputStream out;
+    String message;
+    String MEAASGE;
+    String peerID = "1";
+    String serverPeerID = "2";
+    String serverPeerAddr = "localhost";
+    int serverPeerPort = 8000;
+    HandShakeMsg sentHandShakeMsg = new HandShakeMsg(); // HandShake Msg send to the server
+    HandShakeMsg receivedHandShakeMsg = new HandShakeMsg(); // HandShake Msg received from the server
 
-	public void Client() {}
 
-	void run()
-	{
-		try{
-			//create a socket to connect to the server
-			requestSocket = new Socket("10.136.42.119", 8000);
-			System.out.println("Connected to localhost in port 8000");
-			//initialize inputStream and outputStream
-			out = new ObjectOutputStream(requestSocket.getOutputStream());
-			out.flush();
-			in = new ObjectInputStream(requestSocket.getInputStream());
-			
-			//get Input from standard input
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-			while(true)
-			{
-				System.out.print("Hello, please input a sentence: ");
-				//read a sentence from the standard input
-				message = bufferedReader.readLine();
-				//Send the sentence to the server
-				sendMessage(message);
-				//Receive the upperCase sentence from the server
-				MESSAGE = (String)in.readObject();
-				//show the message to the user
-				System.out.println("Receive message: " + MESSAGE);
-			}
-		}
-		catch (ConnectException e) {
-    			System.err.println("Connection refused. You need to initiate a server first.");
-		} 
-		catch ( ClassNotFoundException e ) {
-            		System.err.println("Class not found");
-        	} 
-		catch(UnknownHostException unknownHost){
-			System.err.println("You are trying to connect to an unknown host!");
-		}
-		catch(IOException ioException){
-			ioException.printStackTrace();
-		}
-		finally{
-			//Close connections
-			try{
-				in.close();
-				out.close();
-				requestSocket.close();
-			}
-			catch(IOException ioException){
-				ioException.printStackTrace();
-			}
-		}
-	}
-	//send a message to the output stream
-	void sendMessage(String msg)
-	{
-		try{
-			//stream write the message
-			out.writeObject(msg);
-			out.flush();
-		}
-		catch(IOException ioException){
-			ioException.printStackTrace();
-		}
-	}
-	//main method
-	public static void main(String args[])
-	{
-		Client client = new Client();
-		client.run();
-	}
+    public Client(){}
 
+    public void run(){
+        try{
+            //initialize Socket of client
+            requestSocket = new Socket(serverPeerAddr, serverPeerPort);
+            System.out.println("{Client} connect to localhost at port 8000");
+            //initialize outputstream and inputstream
+            out = new ObjectOutputStream(requestSocket.getOutputStream());
+            out.flush();
+            in = new ObjectInputStream(requestSocket.getInputStream());
+            //set peerID of the current peer
+            sentHandShakeMsg.setPeerID(peerID);
+            System.out.println("{Client} Send handshake message from Client " + peerID + " to Client " + this.serverPeerID) ;
+            sendHandShakeMsg(sentHandShakeMsg);
+
+            Object readObject = in.readObject();
+            System.out.println("{Client} Receive: " + readObject.getClass().getName());
+
+            if(readObject.getClass().getName() == "HandShakeMsg"){
+                receivedHandShakeMsg = (HandShakeMsg) readObject;
+                System.out.println("{Client} Receive handshake message " + receivedHandShakeMsg.getHandShakeHeader() + "from Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()));
+
+                if(receivedHandShakeMsg.getPeerID() == serverPeerID){
+                    System.out.println("{Client} HandShake succeed! ");
+                }
+            }
+
+        }
+        catch (ConnectException e)
+        {
+            System.err.println("Connection refused. You need to initiate a server first.");
+        }
+        catch ( ClassNotFoundException e )
+        {
+            System.err.println("Class not found");
+        }
+        catch(UnknownHostException unknownHost)
+        {
+            System.err.println("You are trying to connect to an unknown host!");
+        }
+        catch(IOException ioException)
+        {
+            ioException.printStackTrace();
+        } finally {
+            //close TCP connection
+            try {
+                in.close();
+                out.close();
+                requestSocket.close();
+            }
+            catch (IOException ioException){
+                ioException.printStackTrace();
+            }
+        }
+    }
+    public static void main(String args[]){
+        Client client = new Client();
+        client.run();
+    }
+
+
+    public void sendMsg(String message){
+        /***
+         * send message via socket
+         */
+        try {
+            out.writeObject(message);
+            out.flush();
+            System.out.println("{Client} Send message: " + message);
+        }
+        catch (IOException ioException){
+            ioException.printStackTrace();
+        }
+    }
+
+    public void sendHandShakeMsg(HandShakeMsg handShakeMsg){
+        /***
+         * send HandShakeMessage via socket
+         */
+        try {
+            out.writeObject(handShakeMsg);
+            out.flush();
+        }
+        catch (IOException ioException){
+            ioException.printStackTrace();
+        }
+    }
 }
 
-class HandShakeMsg {
-
-	private byte[] handShakeHeader;
-	private byte[] zeroBits;
-	private byte[] peerID;
-
-	public HandShakeMsg(){
-		this.handShakeHeader = Parameters.HandShakeMsg.getBytes();
-		this.zeroBits = new byte[10];
-		this.peerID = new byte[4];
-	}
-}
