@@ -1,32 +1,43 @@
+package Msg;
+
+import Msg.ActualMsg;
+
 /**
- * Created by xiyaoma on 10/20/17.
+ * Created by jiantaozhang on 2017/10/20.
  */
-public class BitFieldMsg {
+public class BitField extends ActualMsg {
 
-    byte[] messageLength;
-    byte[] messageType;
-    byte[] messagePayload;
-
-    public BitFieldMsg(){
-        this.messageLength = new byte[4];
-        this.messageType = new byte[1];
+    /**
+     * This Msg.BitField class extends Msg.ActualMsg, only define the message type to 5.
+     */
+    public BitField() {
+        super((byte) 5);
     }
 
-    public void setMsgtype(String str){
-        byte[] MsgType = str.getBytes();
-        if(MsgType.length != 1){
-            System.out.println("Invalid Message type, please set a valid one.");
-        }else {
-            this.messageType = MsgType;
+    /**
+     * Get the Msg.BitField payload information, return a boolean for the list of pieces.
+     */
+    public boolean[] getBitFieldPayload() {
+        byte[] payload = getMessagePayload();
+        if (payload == null || payload.length == 0) {
+            throw new IndexOutOfBoundsException("Payload not found, need to set payload first");
         }
+
+        int bytelen = payload.length;
+        int k = 0;
+        boolean[] bitfieldInfo = new boolean[bytelen * 8];
+        for (int i = 0; i < bytelen; i++) {
+            byte b = payload[i];
+            for (int j = 7; j >= 0; j--) {
+                if (((b >> j) & 0x01) == 1) {
+                    bitfieldInfo[k++] = true;
+                } else {
+                    bitfieldInfo[k++] = false;
+                }
+            }
+        }
+        return bitfieldInfo;
     }
 
-    public void setMsgLength(){
-        String length = String.valueOf(this.messageType.length + this.messagePayload.length);
-        this.messageLength = length.getBytes();
-    }
 
-    public void setMsgPayload(){
-
-    }
 }
