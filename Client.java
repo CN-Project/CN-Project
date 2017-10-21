@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
+import Msg.*;
 
 public class Client {
     Socket requestSocket;
@@ -19,7 +20,6 @@ public class Client {
     int serverPeerPort = 8000;
     HandShakeMsg sentHandShakeMsg = new HandShakeMsg(); // HandShake Msg send to the server
     HandShakeMsg receivedHandShakeMsg = new HandShakeMsg(); // HandShake Msg received from the server
-
 
     public Client(){}
 
@@ -40,7 +40,7 @@ public class Client {
             Object readObject = in.readObject();
             System.out.println("{Client} Receive: " + readObject.getClass().getName());
 
-            if(readObject.getClass().getName() == "HandShakeMsg"){
+            if(readObject.getClass().getName() == "Msg.HandShakeMsg"){
                 receivedHandShakeMsg = (HandShakeMsg) readObject;
                 System.out.println("{Client} Receive handshake message " + receivedHandShakeMsg.getHandShakeHeader() + "from Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()));
 

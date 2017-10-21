@@ -36,8 +36,8 @@ public class Server {
         private ObjectOutputStream out;
         private ObjectInputStream in;
         private int clientNum;
-        private HandShakeMsg sentHandShakeMsg = new HandShakeMsg();
-        private HandShakeMsg receivedHandShakeMsg = new HandShakeMsg();
+        private Msg.HandShakeMsg sentHandShakeMsg = new Msg.HandShakeMsg();
+        private Msg.HandShakeMsg receivedHandShakeMsg = new Msg.HandShakeMsg();
         private String peerID = "2";
         private String serverPeerID = "1";
 
@@ -57,9 +57,9 @@ public class Server {
                         Object readObject = in.readObject();
                         System.out.println("{Server} Receive: " + readObject.getClass().getName());
 
-                        if(readObject.getClass().getName() == "HandShakeMsg"){
+                        if(readObject.getClass().getName() == "Msg.HandShakeMsg"){
 
-                            receivedHandShakeMsg = (HandShakeMsg) readObject;
+                            receivedHandShakeMsg = (Msg.HandShakeMsg) readObject;
                             System.out.println("{Server} Receive handshake message " + receivedHandShakeMsg.getHandShakeHeader() + "from Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()));
 
                             sentHandShakeMsg.setPeerID(this.peerID);
@@ -83,7 +83,7 @@ public class Server {
             }
         }
 
-        public void sendHandShakeMsg(HandShakeMsg handShakeMsg){
+        public void sendHandShakeMsg(Msg.HandShakeMsg handShakeMsg){
             /***
              * send HandShakeMessage via socket
              */
