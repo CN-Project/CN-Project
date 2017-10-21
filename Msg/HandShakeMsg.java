@@ -1,3 +1,4 @@
+package Msg;
 import java.io.Serializable;
 
 /**
@@ -15,12 +16,7 @@ public class HandShakeMsg implements Serializable{
     public HandShakeMsg(){
 
         this.handShakeHeader = new byte[18];
-
-        if (Parameters.HandShakeMsg.getBytes().length != 18){
-            System.out.println("invalid ");
-        }else {
-            this.handShakeHeader = Parameters.HandShakeMsg.getBytes();
-        }
+        this.handShakeHeader = "P2PFILESHARINGPROJ".getBytes();
         this.zeroBits = new byte[10];
         this.peerID = new byte[4];
     }
