@@ -7,6 +7,12 @@ Peer.class
     	private String listeningPort;
 
     	private boolean hasFileOrNot;
+
+    	private Set<Peer> interestedList = new HashSet<>();
+
+    	private boolean[] bitFieldNeighbor;
+
+    	private Map<String, boolean[]> bitFieldNeighbor = new HashMap<>()
     Functions:
     	set..
     	get..
