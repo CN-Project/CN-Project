@@ -1,0 +1,12 @@
+Peer.class
+	Variables:
+		private String peerId;
+
+    	private String hostName;
+
+    	private String listeningPort;
+
+    	private boolean hasFileOrNot;
+    Functions:
+    	set..
+    	get..
