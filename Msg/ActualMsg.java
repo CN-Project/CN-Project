@@ -1,10 +1,12 @@
+package Msg;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by jiantaozhang on 2017/10/20.
  */
-public class ActualMsg {
+public class ActualMsg implements Serializable{
 
     /**
      * Define every part of ActualMsg, HashMap used to get message type.
@@ -17,6 +19,7 @@ public class ActualMsg {
 
     protected Map<Byte, String> messageTypeMap;
 
+    public ActualMsg(){}
 
     public ActualMsg(byte messageType) {
 
@@ -43,12 +46,18 @@ public class ActualMsg {
         this.messageType = type;
     }
 
-    public void setMessageLength(byte[] messageLength) {
-        this.messageLength = messageLength;
+    private void setMessageLength() {
+        String length = String.valueOf(1 + this.messagePayload.length);
+        this.messageLength = length.getBytes();
     }
 
     public void setMessagePayload(byte[] payload) {
+
         this.messagePayload = payload;
+        if(payload == null){
+            throw new IndexOutOfBoundsException("Payload is null, please give a valid payload.");
+        }
+        setMessageLength();
     }
 
 

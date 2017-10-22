@@ -5,17 +5,17 @@ import Msg.ActualMsg;
 /**
  * Created by jiantaozhang on 2017/10/20.
  */
-public class BitField extends ActualMsg {
+public class BitFieldMsg extends ActualMsg {
 
     /**
-     * This Msg.BitField class extends Msg.ActualMsg, only define the message type to 5.
+     * This Msg.BitFieldMsg class extends Msg.ActualMsg, only define the message type to 5.
      */
-    public BitField() {
+    public BitFieldMsg() {
         super((byte) 5);
     }
 
     /**
-     * Get the Msg.BitField payload information, return a boolean for the list of pieces.
+     * Get the Msg.BitFieldMsg payload information, return a boolean for the list of pieces.
      */
     public boolean[] getBitFieldPayload() {
         byte[] payload = getMessagePayload();
