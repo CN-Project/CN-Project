@@ -1,4 +1,6 @@
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by jiantaozhang on 2017/10/22.
@@ -13,7 +15,17 @@ public class Peer {
 
     private boolean hasFileOrNot;
 
+    private Set<Peer> interestedList = new HashSet<>();
+
+    private boolean[] bitFieldSelf;
+
+    private Map<String, boolean[]> bitFieldNeighbor;
+
     public Peer(){}
+
+    public Peer(int bitFieldSize) {
+        this.bitFieldSelf = new boolean[bitFieldSize];
+    }
 
     /**
      * Constructor used to set specific params

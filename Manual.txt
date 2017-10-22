@@ -10,7 +10,7 @@ Peer.class
 
     	private Set<Peer> interestedList = new HashSet<>();
 
-    	private boolean[] bitFieldNeighbor;
+    	private boolean[] bitFieldSelf;
 
     	private Map<String, boolean[]> bitFieldNeighbor = new HashMap<>()
     Functions:

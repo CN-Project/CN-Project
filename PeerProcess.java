@@ -16,10 +16,17 @@ public class PeerProcess {
 
     public String PEER_FILE_NAME = "PeerInfo.cfg";
 
+    public Map<String, String> CommonCfgMap;
+
+    public int bitFieldSize;
+
+
     public static void main(String[] args) {
         PeerProcess process = new PeerProcess();
-        Map<String, String> CommonCfgMap = process.getCommonCfg(process.COMMON_FILE_NAME);
-        System.out.println(CommonCfgMap.get("FileSize"));
+        process.getCommonCfg(process.COMMON_FILE_NAME);
+
+        Peer peerA = new Peer(process.bitFieldSize);
+        Peer peerB = new Peer(process.bitFieldSize);
     }
 
     /**
@@ -27,14 +34,14 @@ public class PeerProcess {
      * @param filename
      * @return Map of common configuration
      */
-    public Map<String, String> getCommonCfg(String filename) {
-        Map<String, String> CommonCfg = new HashMap<>();
+    public void getCommonCfg(String filename) {
+        CommonCfgMap = new HashMap<>();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filename));
             String line = reader.readLine();
             while (line != null) {
                 String[] content = line.trim().split(" ");
-                CommonCfg.put(content[0], content[1]);
+                CommonCfgMap.put(content[0], content[1]);
                 line = reader.readLine();
             }
         } catch (FileNotFoundException e) {
@@ -42,6 +49,12 @@ public class PeerProcess {
         } catch (IOException ie) {
             System.out.println("Cannot read this file, please check the file.");
         }
-        return CommonCfg;
+    }
+
+    public void getBitFieldSize() {
+        int fileSize = Integer.parseInt(CommonCfgMap.get("FileSize"));
+        int pieceSize = Integer.parseInt(CommonCfgMap.get("PieceSize"));
+        int numOfPiece = (int) Math.ceil(fileSize / pieceSize);
+        bitFieldSize = (int) Math.ceil(numOfPiece / 8) * 8;
     }
 }
