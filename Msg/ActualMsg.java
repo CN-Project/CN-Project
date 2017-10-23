@@ -79,4 +79,10 @@ public class ActualMsg implements Serializable{
     public byte[] getMessagePayload() {
         return this.messagePayload;
     }
+    public byte[] booleanArray2byteArray(boolean[] bitFiled) {
+        return null;
+    }
+    public boolean[] byteArray2booleanArray(byte[] bytes){
+        return null;
+    }
 }

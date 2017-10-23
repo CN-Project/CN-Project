@@ -1,5 +1,5 @@
 package Msg;
-
+import java.util.*;
 import Msg.ActualMsg;
 
 /**
@@ -10,34 +10,37 @@ public class BitFieldMsg extends ActualMsg {
     /**
      * This Msg.BitFieldMsg class extends Msg.ActualMsg, only define the message type to 5.
      */
-    public BitFieldMsg() {
+    public BitFieldMsg(int numOfPiece) {
         super((byte) 5);
+        this.messagePayload = new byte[(int) Math.ceil(numOfPiece / 8)];
     }
 
-    /**
-     * Get the Msg.BitFieldMsg payload information, return a boolean for the list of pieces.
+    /***
+     * convert boolean array to byte array
+     * @param bitFiled
+     * @return
      */
-    public boolean[] getBitFieldPayload() {
-        byte[] payload = getMessagePayload();
-        if (payload == null || payload.length == 0) {
-            throw new IndexOutOfBoundsException("Payload not found, need to set payload first");
-        }
-
-        int bytelen = payload.length;
-        int k = 0;
-        boolean[] bitfieldInfo = new boolean[bytelen * 8];
-        for (int i = 0; i < bytelen; i++) {
-            byte b = payload[i];
-            for (int j = 7; j >= 0; j--) {
-                if (((b >> j) & 0x01) == 1) {
-                    bitfieldInfo[k++] = true;
-                } else {
-                    bitfieldInfo[k++] = false;
-                }
-            }
-        }
-        return bitfieldInfo;
+    public byte[] booleanArray2byteArray(boolean[] bitFiled) {
+    BitSet bitSet = new BitSet(bitFiled.length / Byte.SIZE);
+    for (int index = 0; index < bitFiled.length; index++) {
+        bitSet.set(index, bitFiled[index] == true);
     }
 
+    return bitSet.toByteArray();
+}
 
+    /***
+     * convert byte array to boolean array
+     * @param bytes
+     * @return boolean array
+     */
+    public boolean[] byteArray2booleanArray(byte[] bytes) {
+         boolean[] result = new boolean[Byte.SIZE * bytes.length];
+         int offset = 0;
+         for (byte b : bytes) {
+          for (int i=0; i<Byte.SIZE; i++) result[i+offset] = (b >> i & 0x1) != 0x0;
+          offset+=Byte.SIZE;
+         }
+         return result;
+    }
 }
