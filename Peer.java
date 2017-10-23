@@ -22,10 +22,13 @@ public class Peer {
 
     private Map<String, boolean[]> bitFieldNeighbor = new HashMap<>();
 
+    private int numOfPiece;
+
     public Peer(){}
 
     public Peer(int numOfPiece) {
         this.bitFieldSelf = new boolean[(int)Math.ceil(numOfPiece / 8) * 8];
+        this.numOfPiece = numOfPiece;
     }
 
     /**
