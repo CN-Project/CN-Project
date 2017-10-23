@@ -14,18 +14,23 @@ public class Peer {
 
     private String listeningPort;
 
-    private boolean hasFileOrNot;
+    private int numOfPiece;
 
-    private Set<Peer> interestedList = new HashSet<>();
+    private boolean hasFileOrNot;
 
     private boolean[] bitFieldSelf;
 
+    private Set<Peer> interestedList = new HashSet<>();
+
     private Map<String, boolean[]> bitFieldNeighbor = new HashMap<>();
 
-    private int numOfPiece;
-
+    // Empty constructor
     public Peer(){}
 
+    /**
+     * Constructor calculating the number of piece and size of bit field.
+     * @param numOfPiece
+     */
     public Peer(int numOfPiece) {
         this.bitFieldSelf = new boolean[(int)Math.ceil(numOfPiece / 8) * 8];
         this.numOfPiece = numOfPiece;
@@ -38,11 +43,13 @@ public class Peer {
      * @param listeningPort
      * @param hasFileOrNot
      */
-    public Peer(String peerId, String hostName, String listeningPort, boolean hasFileOrNot) {
+    public Peer(String peerId, String hostName, String listeningPort, boolean hasFileOrNot, int numOfPiece) {
         this.peerId = peerId;
         this.hostName = hostName;
         this.listeningPort = listeningPort;
         this.hasFileOrNot = hasFileOrNot;
+        this.numOfPiece = numOfPiece;
+        this.bitFieldSelf = new boolean[(int) Math.ceil(numOfPiece / 8) * 8];
     }
 
     /**
@@ -80,8 +87,13 @@ public class Peer {
 
     public void addBitFieldNeighbor(String peerId, boolean[] bitFieldNeighbor){
         this.bitFieldNeighbor.put(peerId, bitFieldNeighbor);
-
     }
+
+    public void updateBitFieldNeighbor(String peerId, int index) {
+        this.bitFieldNeighbor.get(peerId)[index] = true;
+    }
+
+
     /**
      * Functions to get params
      */
@@ -97,6 +109,10 @@ public class Peer {
         return this.listeningPort;
     }
 
+    public int getNumOfPiece() {
+        return this.numOfPiece;
+    }
+
     public boolean getHasFileOrNot() {
         return this.hasFileOrNot;
     }
@@ -109,8 +125,7 @@ public class Peer {
         return this.bitFieldSelf;
     }
 
-    public Map<String, boolean[]> getBitFieldNeighbor(){
-        return this.bitFieldNeighbor;
+    public boolean[] getBitFieldNeighbor(String peerId){
+        return this.bitFieldNeighbor.get(peerId);
     }
-
 }
