@@ -1,18 +1,24 @@
 Peer.class
 	Variables:
-		private String peerId;
+    	private String peerId;
 
     	private String hostName;
 
     	private String listeningPort;
 
-    	private boolean hasFileOrNot;
+    	private int numOfPiece;
 
-    	private Set<Peer> interestedList = new HashSet<>();
+    	private boolean hasFileOrNot;
 
     	private boolean[] bitFieldSelf;
 
-    	private Map<String, boolean[]> bitFieldNeighbor = new HashMap<>()
+    	private Set<Peer> interestedList = new HashSet<>();
+
+    	private Map<String, boolean[]> bitFieldNeighbor = new HashMap<>();
     Functions:
     	set..
     	get..
+    Constructors:
+    	public Peer(){}
+    	public Peer(int numOfPiece) {}
+    	public Peer(String peerId, String hostName, String listeningPort, boolean hasFileOrNot, int numOfPiece) {}
