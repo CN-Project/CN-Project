@@ -8,15 +8,17 @@ import java.util.Set;
  */
 public class Peer {
 
+    /** Four basic variables get from peerInfo */
     private String peerId;
 
     private String hostName;
 
     private String listeningPort;
 
-    private int numOfPiece;
-
     private boolean hasFileOrNot;
+
+    /** A peer will keep its own bitfield info and neighbors' bitfield info, and its interested list */
+    private int numOfPiece;
 
     private boolean[] bitFieldSelf;
 
@@ -24,8 +26,10 @@ public class Peer {
 
     private Map<String, boolean[]> bitFieldNeighbor = new HashMap<>();
 
+
     // Empty constructor
     public Peer(){}
+
 
     /**
      * Constructor calculating the number of piece and size of bit field.
@@ -35,6 +39,7 @@ public class Peer {
         this.bitFieldSelf = new boolean[(int)Math.ceil(numOfPiece / 8) * 8];
         this.numOfPiece = numOfPiece;
     }
+
 
     /**
      * Constructor used to set specific params
