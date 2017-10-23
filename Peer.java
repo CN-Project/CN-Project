@@ -1,3 +1,4 @@
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -19,12 +20,12 @@ public class Peer {
 
     private boolean[] bitFieldSelf;
 
-    private Map<String, boolean[]> bitFieldNeighbor;
+    private Map<String, boolean[]> bitFieldNeighbor = new HashMap<>();
 
     public Peer(){}
 
-    public Peer(int bitFieldSize) {
-        this.bitFieldSelf = new boolean[bitFieldSize];
+    public Peer(int numOfPiece) {
+        this.bitFieldSelf = new boolean[(int)Math.ceil(numOfPiece / 8) * 8];
     }
 
     /**
@@ -60,6 +61,24 @@ public class Peer {
         this.hasFileOrNot = hasFileOrNot;
     }
 
+    public void addInterestedList(Peer peer){
+        this.interestedList.add(peer);
+    }
+
+    public void setBitFieldSelfAllOne(){
+        for(int i = 0; i < this.bitFieldSelf.length; i++){
+            this.bitFieldSelf[i] = true;
+        }
+    }
+
+    public void setBitFieldSelfOneBit(int index){
+        this.bitFieldSelf[index] = true;
+    }
+
+    public void addBitFieldNeighbor(String peerId, boolean[] bitFieldNeighbor){
+        this.bitFieldNeighbor.put(peerId, bitFieldNeighbor);
+
+    }
     /**
      * Functions to get params
      */
@@ -78,4 +97,17 @@ public class Peer {
     public boolean getHasFileOrNot() {
         return this.hasFileOrNot;
     }
+
+    public Set<Peer> getInterestedList(){
+        return this.interestedList;
+    }
+
+    public boolean[] getBitFieldSelf(){
+        return this.bitFieldSelf;
+    }
+
+    public Map<String, boolean[]> getBitFieldNeighbor(){
+        return this.bitFieldNeighbor;
+    }
+
 }
