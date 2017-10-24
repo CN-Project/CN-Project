@@ -52,11 +52,10 @@ public class ActualMsg implements Serializable{
     }
 
     public void setMessagePayload(byte[] payload) {
-
-        this.messagePayload = payload;
         if(payload == null){
             throw new IndexOutOfBoundsException("Payload is null, please give a valid payload.");
         }
+        this.messagePayload = payload;
         setMessageLength();
     }
 
@@ -83,6 +82,9 @@ public class ActualMsg implements Serializable{
         return null;
     }
     public boolean[] byteArray2booleanArray(byte[] bytes){
+        return null;
+    }
+    public byte[] parseIndexFromHaveMsg(){
         return null;
     }
 }

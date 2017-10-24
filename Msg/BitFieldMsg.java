@@ -21,9 +21,9 @@ public class BitFieldMsg extends ActualMsg {
      * @return
      */
     public byte[] booleanArray2byteArray(boolean[] bitFiled) {
-    BitSet bitSet = new BitSet(bitFiled.length / Byte.SIZE);
-    for (int index = 0; index < bitFiled.length; index++) {
-        bitSet.set(index, bitFiled[index] == true);
+        BitSet bitSet = new BitSet(bitFiled.length / Byte.SIZE);
+        for (int index = 0; index < bitFiled.length; index++) {
+            bitSet.set(index, bitFiled[index] == true);
     }
 
     return bitSet.toByteArray();
@@ -35,12 +35,14 @@ public class BitFieldMsg extends ActualMsg {
      * @return boolean array
      */
     public boolean[] byteArray2booleanArray(byte[] bytes) {
-         boolean[] result = new boolean[Byte.SIZE * bytes.length];
-         int offset = 0;
-         for (byte b : bytes) {
-          for (int i=0; i<Byte.SIZE; i++) result[i+offset] = (b >> i & 0x1) != 0x0;
-          offset+=Byte.SIZE;
-         }
-         return result;
+        boolean[] result = new boolean[Byte.SIZE * bytes.length];
+        int offset = 0;
+        for (byte b : bytes) {
+            for (int i=0; i<Byte.SIZE; i++){
+                result[i+offset] = (b >> i & 0x1) != 0x0;
+            }
+            offset+=Byte.SIZE;
+            }
+        return result;
     }
 }
