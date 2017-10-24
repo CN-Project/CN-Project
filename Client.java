@@ -102,7 +102,8 @@ public class Client extends Thread{
                         curPeer.addBitFieldNeighbor(serverPeerID, receivedActualMsg.byteArray2booleanArray(receivedActualMsg.getMessagePayload()));
 
                         if(curPeer.isInterested(curPeer, serverPeerID)){
-
+                            sentActualMsg = new InterestedMsg();
+                            sendActualMsg(sentActualMsg);
                         }
 
 
@@ -114,14 +115,14 @@ public class Client extends Thread{
                         receivedActualMsg = (PieceMsg) readObject;
                         System.out.println("{Client} Receive PieceMsg from Client " + serverPeerID + " to Client" + curPeer.getPeerId());
 
-                        //update the bitField of the curpeer in the bitFieldNeighbors
+                        //update the bitField of the curpeer in the bitFieldSelf
                         byte[] index = receivedActualMsg.parseIndexFromPieceMsg();
-                        curPeer.updateBitFieldNeighbor(curPeer.getPeerId(), curPeer.byteArray2int(index));
+                        curPeer.setBitFieldSelfOneBit(curPeer.byteArray2int(index));
                         // set HaveMsg payload field
                         sentActualMsg = new HaveMsg();
                         sentActualMsg.setMessagePayload(index);
                         // send HaveMsg to all neighbors
-
+                        // To be done, need a clientThreadMap in peer!----------------
                         sendActualMsg(sentActualMsg);
                         System.out.println("{Client} Send HaveMsg from Client " + serverPeerID + " to Client" + curPeer.getPeerId());
                         break;

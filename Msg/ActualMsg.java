@@ -42,6 +42,7 @@ public class ActualMsg implements Serializable{
     /**
      * Functions used to initialize ActualMsg.
      */
+    //need to be forbidden for safety!----------------------------------
     public void setMssagegType(byte type) {
         this.messageType = type;
     }
