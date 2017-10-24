@@ -82,9 +82,27 @@ public class Server extends Thread{
 
                                 sendHandShakeMsg(sentHandShakeMsg);
                                 break;
-                            case "Msg.BitFieldMsg":
+                            case "Msg.BitFieldMsg":// receive Bitfield Msg and send its bitfield Msg back to the Client.
+
                                 receivedAcutalMsg = (BitFieldMsg) readObject;
                                 
+                                break;
+
+                            case "Msg.HaveMsg":
+
+
+                                break;
+
+                            case "Msg.InterestedMsg":
+
+                                break;
+
+                            case "Msg.NotInterestedMsg":
+
+                                break;
+
+                            case "Msg.RequestMsg":
+
                                 break;
                         }
 //                        //receive the message sent from the socket

@@ -32,7 +32,7 @@ public class Client extends Thread{
     private ActualMsg receivedActualMsg; //Actual Msg received from the server
 
 
-    public Client(Peer curPeer, Peer serverPeer, int numOfPiece){
+    public Client(Peer curPeer, Peer serverPeer){
         this.curPeer = curPeer;
         this.serverPeer = serverPeer;
         this.peerID = curPeer.getPeerId();
@@ -41,7 +41,7 @@ public class Client extends Thread{
         this.hasFileOrNot = curPeer.getHasFileOrNot();
 //        this.listeningPort = serverPeer.getListeningPort();
         this.listeningPort = "8000";
-        this.numOfPiece = numOfPiece;
+        this.numOfPiece = curPeer.getNumOfPiece();
 //        // maintain a bitfield of itself for which piece of document it has
 //        curPeer.bitFieldSelf = new boolean[(int)Math.ceil(numOfPiece / 8) * 8];
         if(this.hasFileOrNot == true){
@@ -86,59 +86,59 @@ public class Client extends Thread{
             sendActualMsg(sentActualMsg);
 
             // enter while loop and wait various kinds of Msg from neighbors
-//            while(true){
-//                //read socket in
-//                readObject = in.readObject();
-//                System.out.println("{Client} Receive: " + readObject.getClass().getName());
-//                MsgType = readObject.getClass().getName();
-//
-//                switch (MsgType){
-//                    //received ActualMsg is BitFieldMsg
-//                    case "Msg.BitFieldMsg":
-//                        receivedActualMsg = (BitFieldMsg) readObject;
-//
-//
-//
-//                        break;
-//                    //received ActualMsg is InterestedMsg
-//                    case "Msg.InterestedMsg":
-//
-//
-//                        break;
-//                    //received ActualMsg is NotInterestedMsg
-//                    case "Msg.NotInterestedMsg":
-//
-//
-//                        break;
-//                    //received ActualMsg is RequestMsg
-//                    case "Msg.RequestMsg":
-//
-//
-//                        break;
-//                    //received ActualMsg is PieceMsg
-//                    case "Msg.PieceMsg":
-//
-//
-//                        break;
-//                    //received ActualMsg is ChokeMsg
-//                    case "Msg.ChokeMsg":
-//
-//
-//                        break;
-//                    //received ActualMsg is UnChokeMsg
-//                    case "Msg.UnChokeMsg":
-//
-//
-//                        break;
-//                    //received ActualMsg is HaveMsg
-//                    case "Msg.HaveMsg":
-//
-//
-//                        break;
-//                }
-//
-//
-//            }
+            while(true){
+                //read socket in
+                readObject = in.readObject();
+                System.out.println("{Client} Receive: " + readObject.getClass().getName());
+                MsgType = readObject.getClass().getName();
+
+                switch (MsgType){
+                    //received ActualMsg is BitFieldMsg
+                    case "Msg.BitFieldMsg":
+
+                        receivedActualMsg = (BitFieldMsg) readObject;
+                        System.out.println("{Client} Receive BitFieldMsg from Client " + serverPeerID + " to Client" + curPeer.getPeerId());
+                        //add the bitField of serverPeer into the bitFieldNeighbors
+                        curPeer.addBitFieldNeighbor(serverPeerID, receivedActualMsg.byteArray2booleanArray(receivedActualMsg.getMessagePayload()));
+
+                        if(curPeer.isInterested(curPeer, serverPeerID)){
+
+                        }
+
+
+                        break;
+
+                    //received ActualMsg is PieceMsg
+                    case "Msg.PieceMsg":
+
+                        receivedActualMsg = (PieceMsg) readObject;
+                        System.out.println("{Client} Receive PieceMsg from Client " + serverPeerID + " to Client" + curPeer.getPeerId());
+
+                        //update the bitField of the curpeer in the bitFieldNeighbors
+                        byte[] index = receivedActualMsg.parseIndexFromHaveMsg();
+                        curPeer.updateBitFieldNeighbor(curPeer.getPeerId(), curPeer.byteArray2int(index));
+                        // set HaveMsg payload field
+                        sentActualMsg = new HaveMsg();
+                        sentActualMsg.setMessagePayload(index);
+                        // send HaveMsg to all neighbors
+
+                        sendActualMsg(sentActualMsg);
+                        System.out.println("{Client} Send HaveMsg from Client " + serverPeerID + " to Client" + curPeer.getPeerId());
+                        break;
+                    //received ActualMsg is ChokeMsg
+                    case "Msg.ChokeMsg":
+
+
+                        break;
+                    //received ActualMsg is UnChokeMsg
+                    case "Msg.UnChokeMsg":
+
+
+                        break;
+                }
+
+
+            }
 
 
         }

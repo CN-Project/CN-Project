@@ -1,4 +1,6 @@
 import Msg.*;
+
+import java.time.Period;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -156,5 +158,38 @@ public class Peer {
 
     public Map<String, Client> getConnectedServerMap() {
         return this.connectedServerMap;
+    }
+
+    /***
+     * compare the bitfield of curpeer with bitfield of serverpeer to determine whether it have interested piece or not
+     * @return (boolean) interested or not interested
+     */
+    public boolean isInterested(Peer curpeer, String serverPeerID){
+        boolean[] bitFieldSelf = curpeer.bitFieldSelf;
+        boolean[] bitFieldNeighbor = curpeer.bitFieldNeighbor.get(serverPeerID);
+        assert bitFieldNeighbor.length == bitFieldNeighbor.length;
+        for(int i = 0; i < bitFieldSelf.length; i++){
+            if(bitFieldSelf[i] == false && bitFieldNeighbor[i] == true){
+                return true;
+            }
+            else {
+                continue;
+            }
+        }
+        return false;
+    }
+
+    /***
+     * convert a byte[] to a int, used in the situation that need to parse index from some Msg(haveMsg etc,.).
+     * @return (int) index
+     */
+    public int byteArray2int(byte[] bytes){
+        int val = 0;
+        if(bytes.length > 4) throw new RuntimeException("byte[] is too big to convert into int");
+        for (int i = 0; i < bytes.length; i++) {
+            val=val<<8;
+            val=val|(bytes[i] & 0xFF);
+        }
+        return val;
     }
 }
