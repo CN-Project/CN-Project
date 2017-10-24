@@ -84,7 +84,7 @@ public class ActualMsg implements Serializable{
     public boolean[] byteArray2booleanArray(byte[] bytes){
         return null;
     }
-    public byte[] parseIndexFromHaveMsg(){
+    public byte[] parseIndexFromPieceMsg(){
         return null;
     }
 }

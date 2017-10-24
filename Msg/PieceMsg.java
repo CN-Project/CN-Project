@@ -15,7 +15,7 @@ public class PieceMsg extends ActualMsg {
      * parse 4-byte piece index from HaveMsg
      * @return  4-byte piece index
      */
-    public byte[] parseIndexFromHaveMsg(){
+    public byte[] parseIndexFromPieceMsg(){
         return Arrays.copyOfRange(this.messagePayload, 0, 4);
     }
 }

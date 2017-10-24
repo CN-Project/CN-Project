@@ -115,7 +115,7 @@ public class Client extends Thread{
                         System.out.println("{Client} Receive PieceMsg from Client " + serverPeerID + " to Client" + curPeer.getPeerId());
 
                         //update the bitField of the curpeer in the bitFieldNeighbors
-                        byte[] index = receivedActualMsg.parseIndexFromHaveMsg();
+                        byte[] index = receivedActualMsg.parseIndexFromPieceMsg();
                         curPeer.updateBitFieldNeighbor(curPeer.getPeerId(), curPeer.byteArray2int(index));
                         // set HaveMsg payload field
                         sentActualMsg = new HaveMsg();
