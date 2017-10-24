@@ -1,7 +1,6 @@
 package Msg;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by jiantaozhang on 2017/10/20.
@@ -85,7 +84,16 @@ public class ActualMsg implements Serializable{
     public boolean[] byteArray2booleanArray(byte[] bytes){
         return null;
     }
-    public byte[] parseIndexFromPieceMsg(){
+
+    /***
+     * extract index from Msg, only three Msg have index field, HaveMsg, PieceMsg, RequestedMsg
+     * @return
+     */
+    public byte[] parseIndexFromPieceMsg(){ // Xiyao Ma
+        if(this.getMessageType() == "Have" || this.getMessageType() == "Request" || this.getMessageType() == "Piece"){
+            return Arrays.copyOfRange(this.messagePayload, 0, 4);
+        }
+        System.out.println("Wrong Msg Type, don't has index filed. Msg must be one of following Msgs: HaveMsg, RequestMsg, PieceMsg. ");
         return null;
     }
 }

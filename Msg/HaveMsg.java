@@ -15,6 +15,4 @@ public class HaveMsg extends ActualMsg{
         super((byte) 4);
         setMessagePayload(payload);
     }
-
-
 }

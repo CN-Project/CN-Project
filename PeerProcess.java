@@ -120,7 +120,7 @@ public class PeerProcess {
             Peer serverPeer = entry.getValue();
             if (Integer.parseInt(serverPeerID) < Integer.parseInt(peerID)) {
                 Client newConnection = new Client(this.inputPeer, serverPeer);
-                this.inputPeer.addConnectedServerMap(serverPeerID, newConnection);
+                this.inputPeer.addClientThreadMap(serverPeerID, newConnection);
                 newConnection.start();
             }
         }

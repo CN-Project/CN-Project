@@ -24,16 +24,20 @@ public class Peer {
 
     private boolean[] bitFieldSelf;
 
+    /** used in response bitField, if the server has no pieces at all, it has no need to send bitFieldMsg back */
+    private boolean hasPiecesOrNot = false;
+
+
     /** Store downloaded file pieces in fileStore[int index][byte[] content]. */
     private byte[][] fileStore;
 
     /** A peer will keep its own bitfield info and neighbors' bitfield info, and its interested list */
-    private Set<Peer> interestedList = new HashSet<>();
+    private Set<String> interestedList = new HashSet<>();
 
     private Map<String, boolean[]> bitFieldNeighbor = new HashMap<>();
 
     /** Every peer will keep the server that it has already connected with as < serverPeerID, ClientConnectionThread > */
-    private Map<String, Client> connectedServerMap = new HashMap<>();
+    private Map<String, Client> clientThreadMap = new HashMap<>();
 
 
     // Empty constructor
@@ -87,22 +91,24 @@ public class Peer {
         this.hasFileOrNot = hasFileOrNot;
     }
 
-    public void addInterestedList(Peer peer){
-        this.interestedList.add(peer);
-    }
-
-    public void setBitFieldSelfAllOne(){
-        for(int i = 0; i < this.bitFieldSelf.length; i++){
-            this.bitFieldSelf[i] = true;
-        }
+    public void addInterestedList(String peerID){
+        this.interestedList.add(peerID);
     }
 
     public void setFileStore(byte[] content, int index) {
         this.fileStore[index] = content;
     }
 
+    public void setBitFieldSelfAllOne(){
+        for(int i = 0; i < this.bitFieldSelf.length; i++){
+            this.bitFieldSelf[i] = true;
+        }
+        this.hasPiecesOrNot = true;
+    }
+
     public void setBitFieldSelfOneBit(int index){
         this.bitFieldSelf[index] = true;
+        this.hasPiecesOrNot = true;
     }
 
     public void addBitFieldNeighbor(String peerId, boolean[] bitFieldNeighbor){
@@ -113,8 +119,8 @@ public class Peer {
         this.bitFieldNeighbor.get(peerId)[index] = true;
     }
 
-    public void addConnectedServerMap(String peerId, Client client) {
-        connectedServerMap.put(peerId, client);
+    public void addClientThreadMap(String peerId, Client client) {
+        clientThreadMap.put(peerId, client);
     }
 
     /**
@@ -140,7 +146,7 @@ public class Peer {
         return this.hasFileOrNot;
     }
 
-    public Set<Peer> getInterestedList(){
+    public Set<String> getInterestedList(){
         return this.interestedList;
     }
 
@@ -156,24 +162,24 @@ public class Peer {
         return this.bitFieldNeighbor.get(peerId);
     }
 
-    public Map<String, Client> getConnectedServerMap() {
-        return this.connectedServerMap;
+    public Map<String, Client> getClientThreadMap() {
+        return this.clientThreadMap;
+    }
+
+    public boolean isHasPieces(){
+        return this.hasPiecesOrNot;
     }
 
     /***
      * compare the bitfield of curpeer with bitfield of serverpeer to determine whether it have interested piece or not
      * @return (boolean) interested or not interested
      */
-    public boolean isInterested(Peer curpeer, String serverPeerID){
-        boolean[] bitFieldSelf = curpeer.bitFieldSelf;
-        boolean[] bitFieldNeighbor = curpeer.bitFieldNeighbor.get(serverPeerID);
-        assert bitFieldNeighbor.length == bitFieldNeighbor.length;
+    public boolean isInterested(String serverPeerID){
+        boolean[] bitFieldSelf = this.bitFieldSelf;
+        boolean[] bitFieldNeighbor = this.bitFieldNeighbor.get(serverPeerID);
         for(int i = 0; i < bitFieldSelf.length; i++){
-            if(bitFieldSelf[i] == false && bitFieldNeighbor[i] == true){
+            if(!bitFieldSelf[i] && bitFieldNeighbor[i]){
                 return true;
-            }
-            else {
-                continue;
             }
         }
         return false;
