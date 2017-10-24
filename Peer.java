@@ -39,6 +39,31 @@ public class Peer {
     /** Every peer will keep the server that it has already connected with as < serverPeerID, ClientConnectionThread > */
     private Map<String, Client> clientThreadMap = new HashMap<>();
 
+    public HashMap<String, Integer> getDownloadRateMap() {
+        return downloadRateMap;
+    }
+
+    private HashMap<String, Integer> downloadRateMap = new HashMap<>();
+
+    public Set<String> getUnchokedList() {
+        return unchokedList;
+    }
+
+    public void setUnchokedList(Set<String> unchokedList) {
+        this.unchokedList = unchokedList;
+    }
+
+    private Set<String> unchokedList = new HashSet<>();
+
+    public Set<String> getChokedList() {
+        return chokedList;
+    }
+
+    public void setChokedList(Set<String> chokedList) {
+        this.chokedList = chokedList;
+    }
+
+    private Set<String> chokedList = new HashSet<>();
 
     // Empty constructor
     public Peer(){}
