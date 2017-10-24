@@ -24,6 +24,8 @@ public class PeerProcess {
 
         PeerProcess process = new PeerProcess();
 
+
+
         /** Get common configuration info and store in a map*/
         process.getCommonCfg(process.COMMON_FILE_NAME);
         int fileSize = Integer.parseInt(process.CommonCfgMap.get("FileSize"));
@@ -37,13 +39,11 @@ public class PeerProcess {
         /** Create connection to former peers and self server for this input peer. */
         String inputPeerID = args[0];
         process.inputPeer = process.peerList.get(inputPeerID);
-
-        System.out.println(process.inputPeer.getFileStore().length);
         process.setupConnection(process.peerList);
         process.createServer();
 
         /** Create the file directory, if the input peer contains all file, split it into pieces. */
-        process.fileHandling();
+//        process.fileHandling();
 
     }
 

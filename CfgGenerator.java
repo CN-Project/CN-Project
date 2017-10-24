@@ -1,6 +1,4 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
 
 /**
  * Created by jiantaozhang on 2017/10/20.
@@ -8,7 +6,7 @@ import java.io.PrintWriter;
 public class CfgGenerator {
 
     /**
-     * Define constant values for CommonCfg
+     * Define default values for CommonCfg
      */
     private static final int NUMBER_OF_PREFERRED_NEIGHBORS = 2;
 
@@ -23,6 +21,18 @@ public class CfgGenerator {
     private static final String FILE_NAME = "TheFile.dat";
 
 
+    public static void main(String[] args) {
+        CfgGenerator cfg = new CfgGenerator();
+        cfg.writeCommonCfg();
+        File peerInfo = new File("PeerInfo.cfg");
+        if (peerInfo.exists()) {
+            peerInfo.delete();
+        }
+        cfg.writePeerInfo(1001, "lin114-00-cise.ufl.edu", 6008, 1);
+        for (int i = 1; i <= 5; i++) {
+            cfg.writePeerInfo(1001 + i, "lin114-0" + i + "-cise.ufl.edu", 6008, 0);
+        }
+    }
     /**
      * Write Common.cfg using specific parameters
      */
@@ -44,6 +54,7 @@ public class CfgGenerator {
         }
     }
 
+
     /**
      * Use the default values if no specific value is given
      */
@@ -53,27 +64,21 @@ public class CfgGenerator {
                        FILE_SIZE, PIECE_SIZE);
     }
 
+
     /**
      *Write PeerInfo.cfg using specific parameters
      */
     public void writePeerInfo(int peerID, String hostName, int listeningPort, int hasFileOrNot) {
-
         try {
-            PrintWriter out = new PrintWriter(new File("PeerInfo.cfg"));
-            out.println(peerID + " " + hostName + " " + listeningPort + " " + hasFileOrNot);
+            FileWriter out = new FileWriter(new File("PeerInfo.cfg"), true);
+            out.write(peerID + " " + hostName + " " + listeningPort + " " + hasFileOrNot + "\n");
             out.close();
         } catch (FileNotFoundException e) {
             System.out.println("Cannot generate cfg file, file not found");
+        } catch (IOException ie) {
+            ie.printStackTrace();
         }
 
     }
-
-
-    public static void main(String[] args) {
-        CfgGenerator cg = new CfgGenerator();
-        cg.writeCommonCfg();
-        cg.writePeerInfo(1001, "lin114-00-cise.ufl.edu", 6008, 1);
-    }
-
 
 }
