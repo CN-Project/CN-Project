@@ -23,7 +23,9 @@ public class PeerProcess {
     public static void main(String[] args) {
 
         PeerProcess process = new PeerProcess();
-
+        CfgGenerator cfgGenerator = new CfgGenerator();
+        cfgGenerator.run();
+        System.out.println("Successfully generate configuration files......" + "\n");
 
 
         /** Get common configuration info and store in a map*/
@@ -37,6 +39,7 @@ public class PeerProcess {
         process.getPeerCfg(process.PEER_FILE_NAME, numOfPiece);
 
         /** Create connection to former peers and self server for this input peer. */
+        System.out.println("Start to join input peer into whole network......" + "\n");
         String inputPeerID = args[0];
         process.inputPeer = process.peerList.get(inputPeerID);
         process.setupConnection(process.peerList);

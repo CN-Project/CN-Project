@@ -21,7 +21,7 @@ public class CfgGenerator {
     private static final String FILE_NAME = "TheFile.dat";
 
 
-    public static void main(String[] args) {
+    public void run() {
         CfgGenerator cfg = new CfgGenerator();
         cfg.writeCommonCfg();
         File peerInfo = new File("PeerInfo.cfg");
