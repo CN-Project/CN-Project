@@ -1,3 +1,4 @@
+import Msg.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -17,14 +18,20 @@ public class Peer {
 
     private boolean hasFileOrNot;
 
-    /** A peer will keep its own bitfield info and neighbors' bitfield info, and its interested list */
     private int numOfPiece;
 
     private boolean[] bitFieldSelf;
 
+    /** Store downloaded file pieces in fileStore[int index][byte[] content]. */
+    private byte[][] fileStore;
+
+    /** A peer will keep its own bitfield info and neighbors' bitfield info, and its interested list */
     private Set<Peer> interestedList = new HashSet<>();
 
     private Map<String, boolean[]> bitFieldNeighbor = new HashMap<>();
+
+    /** Every peer will keep the server that it has already connected with as < serverPeerID, ClientConnectionThread > */
+    private Map<String, Client> connectedServerMap = new HashMap<>();
 
 
     // Empty constructor
@@ -36,8 +43,9 @@ public class Peer {
      * @param numOfPiece
      */
     public Peer(int numOfPiece) {
-        this.bitFieldSelf = new boolean[(int)Math.ceil(numOfPiece / 8) * 8];
         this.numOfPiece = numOfPiece;
+        this.bitFieldSelf = new boolean[(int) Math.ceil((double) numOfPiece / 8) * 8];
+        this.fileStore = new byte[numOfPiece][];
     }
 
 
@@ -54,7 +62,8 @@ public class Peer {
         this.listeningPort = listeningPort;
         this.hasFileOrNot = hasFileOrNot;
         this.numOfPiece = numOfPiece;
-        this.bitFieldSelf = new boolean[(int) Math.ceil(numOfPiece / 8) * 8];
+        this.bitFieldSelf = new boolean[(int) Math.ceil((double) numOfPiece / 8) * 8];
+        this.fileStore = new byte[numOfPiece][];
     }
 
     /**
@@ -86,6 +95,10 @@ public class Peer {
         }
     }
 
+    public void setFileStore(byte[] content, int index) {
+        this.fileStore[index] = content;
+    }
+
     public void setBitFieldSelfOneBit(int index){
         this.bitFieldSelf[index] = true;
     }
@@ -98,6 +111,9 @@ public class Peer {
         this.bitFieldNeighbor.get(peerId)[index] = true;
     }
 
+    public void addConnectedServerMap(String peerId, Client client) {
+        connectedServerMap.put(peerId, client);
+    }
 
     /**
      * Functions to get params
@@ -126,11 +142,19 @@ public class Peer {
         return this.interestedList;
     }
 
+    public byte[][] getFileStore() {
+        return fileStore;
+    }
+
     public boolean[] getBitFieldSelf(){
         return this.bitFieldSelf;
     }
 
     public boolean[] getBitFieldNeighbor(String peerId){
         return this.bitFieldNeighbor.get(peerId);
+    }
+
+    public Map<String, Client> getConnectedServerMap() {
+        return this.connectedServerMap;
     }
 }
