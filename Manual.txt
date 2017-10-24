@@ -1,20 +1,27 @@
 Peer.class
 	Variables:
-    	private String peerId;
+        private String peerId;
 
-    	private String hostName;
+        private String hostName;
 
-    	private String listeningPort;
+        private String listeningPort;
 
-    	private int numOfPiece;
+        private boolean hasFileOrNot;
 
-    	private boolean hasFileOrNot;
+        private int numOfPiece;
 
-    	private boolean[] bitFieldSelf;
+        private boolean[] bitFieldSelf;
 
-    	private Set<Peer> interestedList = new HashSet<>();
+        /** Store downloaded file pieces in fileStore[int index][byte[] content]. */
+        private byte[][] fileStore;
 
-    	private Map<String, boolean[]> bitFieldNeighbor = new HashMap<>();
+        /** A peer will keep its own bitfield info and neighbors' bitfield info, and its interested list */
+        private Set<Peer> interestedList = new HashSet<>();
+
+        private Map<String, boolean[]> bitFieldNeighbor = new HashMap<>();
+
+        /** Every peer will keep the server that it has already connected with as < serverPeerID, ClientConnectionThread > */
+        private Map<String, Client> connectedServerMap = new HashMap<>();
     Functions:
     	set..
     	get..
@@ -22,3 +29,8 @@ Peer.class
     	public Peer(){}
     	public Peer(int numOfPiece) {}
     	public Peer(String peerId, String hostName, String listeningPort, boolean hasFileOrNot, int numOfPiece) {}
+    Size:
+        numOfPiece.size = 306;
+        fileStore.size = 306;
+        bitfield.size = 312;
+        bitFieldPayload.size = 39;

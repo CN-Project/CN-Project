@@ -2,8 +2,6 @@
  * Created by xiyaoma on 10/19/17.
  */
 import Msg.*;
-import Msg.ActualMsg;
-import Msg.BitFieldMsg;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -13,12 +11,12 @@ import java.nio.channels.*;
 import java.util.*;
 import java.util.logging.Handler;
 
-public class Server {
+public class Server extends Thread {
 
-    public String linsteningPort;
+    public Peer curPeer;
 
     public Server(Peer serverPeer) {
-        this.linsteningPort = serverPeer.getListeningPort();
+        this.curPeer = serverPeer;
     }
 
     public static void main(String args[]) throws IOException {
@@ -39,30 +37,29 @@ public class Server {
 
     private static class Handler extends Thread{
         private String MsgType;
-        private Socket connection;
+        private Socket socket;
         private ObjectOutputStream out;
         private ObjectInputStream in;
         private int clientNum;
         // Message used for handShake.
-        private Msg.HandShakeMsg sentHandShakeMsg = new Msg.HandShakeMsg();
-        private Msg.HandShakeMsg receivedHandShakeMsg = new Msg.HandShakeMsg();
+        private HandShakeMsg sentHandShakeMsg = new HandShakeMsg();
+        private HandShakeMsg receivedHandShakeMsg = new HandShakeMsg();
         // Actual message with different types.
         private ActualMsg sentActualMsg;
         private ActualMsg receivedAcutalMsg;
-        private String peerID = "2";
-        private String serverPeerID = "1";
+        private String peerID;
 
         public Handler(Socket connection, int clientNum){
-            this.connection = connection;
+            this.socket = connection;
             this.clientNum = clientNum;
         }
 
         public void run(){
             try {
                 //initialize Input and Output streams
-                out = new ObjectOutputStream(connection.getOutputStream());
+                out = new ObjectOutputStream(socket.getOutputStream());
                 out.flush();
-                in = new ObjectInputStream(connection.getInputStream());
+                in = new ObjectInputStream(socket.getInputStream());
                 try {
                     while (true){
                         Object readObject = in.readObject();
@@ -83,7 +80,7 @@ public class Server {
                                 break;
                             case "Msg.BitFieldMsg":
                                 receivedAcutalMsg = (BitFieldMsg) readObject;
-                                
+
 
                         }
 //                        //receive the message sent from the socket
