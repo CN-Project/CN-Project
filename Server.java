@@ -2,6 +2,8 @@
  * Created by xiyaoma on 10/19/17.
  */
 import Msg.*;
+import Msg.ActualMsg;
+import Msg.BitFieldMsg;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -11,27 +13,30 @@ import java.nio.channels.*;
 import java.util.*;
 import java.util.logging.Handler;
 
-public class Server extends Thread {
+public class Server extends Thread{
 
-    public Peer curPeer;
+    private String linsteningPort;
+    private Peer curPeer;
 
-    public Server(Peer serverPeer) {
-        this.curPeer = serverPeer;
+    public Server(Peer curPeer) {
+        this.linsteningPort = curPeer.getListeningPort();
     }
-
-    public static void main(String args[]) throws IOException {
-        System.out.println("{Server} The server is running.");
-        ServerSocket serverSocket = new ServerSocket(8000);
-        int clientNum = 1;
-        try{
-            while (true){
-                new Handler(serverSocket.accept(),clientNum).start();
-                System.out.println("{Server} Client " + clientNum + "is connected.");
-                clientNum++;
+    public void run()
+    {
+        try
+        {
+            System.out.println("The server is running.");
+            ServerSocket serverSocket = new ServerSocket(Integer.parseInt(this.linsteningPort));
+            while(true)
+            {
+                Socket socket = serverSocket.accept();
+                new Handler(socket, this.curPeer).start();
+                System.out.println("Client is connected!");
             }
         }
-        finally {
-            serverSocket.close();
+        catch (IOException ioException)
+        {
+            ioException.printStackTrace();
         }
     }
 
@@ -41,17 +46,17 @@ public class Server extends Thread {
         private ObjectOutputStream out;
         private ObjectInputStream in;
         private int clientNum;
-        // Message used for handShake.
-        private HandShakeMsg sentHandShakeMsg = new HandShakeMsg();
-        private HandShakeMsg receivedHandShakeMsg = new HandShakeMsg();
-        // Actual message with different types.
+
+        private Msg.HandShakeMsg sentHandShakeMsg = new Msg.HandShakeMsg();
+        private Msg.HandShakeMsg receivedHandShakeMsg = new Msg.HandShakeMsg();
         private ActualMsg sentActualMsg;
         private ActualMsg receivedAcutalMsg;
-        private String peerID;
+        private String peerId;
+        private Peer curPeer;
 
-        public Handler(Socket connection, int clientNum){
-            this.socket = connection;
-            this.clientNum = clientNum;
+        public Handler(Socket socket, Peer curPeer){
+            this.socket = socket;
+            this.curPeer = curPeer;
         }
 
         public void run(){
@@ -64,7 +69,6 @@ public class Server extends Thread {
                     while (true){
                         Object readObject = in.readObject();
                         System.out.println("{Server} Receive: " + readObject.getClass().getName());
-
                         MsgType = readObject.getClass().getName();
                         switch (MsgType) {
                             case "Msg.HandShakeMsg":
@@ -72,16 +76,16 @@ public class Server extends Thread {
                                 System.out.println("{Server} Receive handshake message " + receivedHandShakeMsg.getHandShakeHeader()
                                         + "from Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()));
 
-                                sentHandShakeMsg.setPeerID(this.peerID);
-                                System.out.println("{Server} Send handshake message from Client " + peerID + "to Client "
+                                sentHandShakeMsg.setPeerID(this.peerId);
+                                System.out.println("{Server} Send handshake message from Client " + peerId + "to Client "
                                         + Integer.parseInt(receivedHandShakeMsg.getPeerID()));
 
                                 sendHandShakeMsg(sentHandShakeMsg);
                                 break;
                             case "Msg.BitFieldMsg":
                                 receivedAcutalMsg = (BitFieldMsg) readObject;
-
-
+                                
+                                break;
                         }
 //                        //receive the message sent from the socket
 //                        message = (String) in.readObject();
