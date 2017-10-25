@@ -27,43 +27,28 @@ public class Peer {
     /** used in response bitField, if the server has no pieces at all, it has no need to send bitFieldMsg back */
     private boolean hasPiecesOrNot = false;
 
-
     /** Store downloaded file pieces in fileStore[int index][byte[] content]. */
     private byte[][] fileStore;
 
     /** A peer will keep its own bitfield info and neighbors' bitfield info, and its interested list */
     private Set<String> interestedList = new HashSet<>();
 
+    /** A map store all other peers' bitfield array. */
     private Map<String, boolean[]> bitFieldNeighbor = new HashMap<>();
 
     /** Every peer will keep the server that it has already connected with as < serverPeerID, ClientConnectionThread > */
     private Map<String, Client> clientThreadMap = new HashMap<>();
 
-    public HashMap<String, Integer> getDownloadRateMap() {
-        return downloadRateMap;
-    }
-
+    /** Store the download rate for every peer, used to decided preferred neighbor. */
     private HashMap<String, Integer> downloadRateMap = new HashMap<>();
 
-    public Set<String> getUnchokedList() {
-        return unchokedList;
-    }
-
-    public void setUnchokedList(Set<String> unchokedList) {
-        this.unchokedList = unchokedList;
-    }
-
+    /** Every peer will keep the unchoked list for preferred neighbor. */
     private Set<String> unchokedList = new HashSet<>();
 
-    public Set<String> getChokedList() {
-        return chokedList;
-    }
-
-    public void setChokedList(Set<String> chokedList) {
-        this.chokedList = chokedList;
-    }
-
+    /** List that stores all choked peers. */
     private Set<String> chokedList = new HashSet<>();
+
+
 
     // Empty constructor
     public Peer(){}
@@ -148,6 +133,15 @@ public class Peer {
         clientThreadMap.put(peerId, client);
     }
 
+    public void setUnchokedList(Set<String> unchokedList) {
+        this.unchokedList = unchokedList;
+    }
+
+    public void setChokedList(Set<String> chokedList) {
+        this.chokedList = chokedList;
+    }
+
+
     /**
      * Functions to get params
      */
@@ -189,6 +183,18 @@ public class Peer {
 
     public Map<String, Client> getClientThreadMap() {
         return this.clientThreadMap;
+    }
+
+    public HashMap<String, Integer> getDownloadRateMap() {
+        return downloadRateMap;
+    }
+
+    public Set<String> getUnchokedList() {
+        return unchokedList;
+    }
+
+    public Set<String> getChokedList() {
+        return chokedList;
     }
 
     public boolean isHasPieces(){
