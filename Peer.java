@@ -24,6 +24,8 @@ public class Peer {
 
     private boolean[] bitFieldSelf;
 
+    /** determine the bitField Msg is the first time or the second time to be received */
+    private boolean hasReceivedBitFieldMsgOnce = true;
     /** used in response bitField, if the server has no pieces at all, it has no need to send bitFieldMsg back */
     private boolean hasPiecesOrNot = false;
 
@@ -141,6 +143,9 @@ public class Peer {
         this.chokedList = chokedList;
     }
 
+    public void setHasReceivedBitFieldMsgOnce(){
+        this.hasReceivedBitFieldMsgOnce = false;
+    }
 
     /**
      * Functions to get params
@@ -195,6 +200,10 @@ public class Peer {
 
     public Set<String> getChokedList() {
         return chokedList;
+    }
+
+    public boolean isHasReceivedBitFieldMsgOnce(){
+        return this.hasReceivedBitFieldMsgOnce;
     }
 
     public boolean isHasPieces(){

@@ -81,69 +81,13 @@ public class Client extends Thread{
             System.out.println("{Client} sent bitfieldMsg from Client " + this.clientPeerId + "to Client " + this.serverPeerID);
             sendActualMsg(sentActualMsg);
 
-            // enter while loop and wait various kinds of Msg from neighbors
-            while(true){
-                //read socket in
-                readObject = in.readObject();
-                System.out.println("{Client} Receive: " + readObject.getClass().getName());
-                MsgType = readObject.getClass().getName();
-
-                switch (MsgType){
-                    //received ActualMsg is BitFieldMsg
-                    case "Msg.BitFieldMsg":
-
-                        receivedActualMsg = (BitFieldMsg) readObject;
-                        System.out.println("{Client} Receive BitFieldMsg from Server " + this.serverPeerID + " to Client" + clientPeer.getPeerId());
-                        //add the bitField of serverPeer into the bitFieldNeighbors
-                        clientPeer.addBitFieldNeighbor(serverPeerID, receivedActualMsg.byteArray2booleanArray(receivedActualMsg.getMessagePayload()));
-                        // send InterestedMsg or NotInterestedMsg
-                        if(clientPeer.isInterested(serverPeerID)){
-                            sentActualMsg = new InterestedMsg();
-                            this.sendActualMsg(sentActualMsg);
-                        }else {
-                            sentActualMsg = new NotInterestedMsg();
-                            this.sendActualMsg(sentActualMsg);
-                        }
-                        break;
-
-                    //received ActualMsg is PieceMsg
-                    case "Msg.PieceMsg":
-
-                        receivedActualMsg = (PieceMsg) readObject;
-                        System.out.println("{Client} Receive PieceMsg from Server " + serverPeerID + " to Client" + clientPeer.getPeerId());
-
-                        //update the bitField of the clientPeer in the bitFieldSelf
-                        indexOfPiece = receivedActualMsg.parseIndexFromPieceMsg();
-                        clientPeer.setBitFieldSelfOneBit(clientPeer.byteArray2int(indexOfPiece));
-
-                        // set HaveMsg payload field
-                        sentActualMsg = new HaveMsg();
-                        sentActualMsg.setMessagePayload(indexOfPiece);
-
-                        // send HaveMsg to all neighbors
-                        for(Map.Entry<String, Client> entry : clientPeer.getClientThreadMap().entrySet()){
-                            Client client = entry.getValue();
-                            String destinationPeerID = entry.getKey();
-                            client.sendActualMsg(sentActualMsg);
-                            System.out.println("{Client} Send HaveMsg from Client " + clientPeerId + " to Server " + destinationPeerID);
-                        }
-                        this.sendActualMsg(sentActualMsg);
-                        System.out.println("{Client} Send HaveMsg from Server " + serverPeerID + " to Client" + clientPeer.getPeerId());
-                        break;
-                    //received ActualMsg is ChokeMsg
-                    case "Msg.ChokeMsg":
-
-
-                        break;
-                    //received ActualMsg is UnChokeMsg
-                    case "Msg.UnChokeMsg":
-
-
-                        break;
-                }
-
-
-            }
+//            // enter while loop and wait various kinds of Msg from neighbors
+//            while(true){
+//                //read socket in
+//                readObject = in.readObject();
+//                System.out.println("{Client} Receive: " + readObject.getClass().getName());
+//                MsgType = readObject.getClass().getName();
+//            }
 
 
         }

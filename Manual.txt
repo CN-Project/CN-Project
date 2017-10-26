@@ -22,6 +22,13 @@ Peer.class
 
         /** Every peer will keep the server that it has already connected with as < serverPeerID, ClientConnectionThread > */
         private Map<String, Client> connectedServerMap = new HashMap<>();
+
+        /** determine the bitField Msg is the first time or the second time to be received */
+        private boolean hasReceivedBitFieldMsgOnce = true;
+
+        /** used in response bitField, if the server has no pieces at all, it has no need to send bitFieldMsg back */
+        private boolean hasPiecesOrNot = false;
+
     Functions:
     	set..
     	get..

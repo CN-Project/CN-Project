@@ -48,7 +48,7 @@ public class Server extends Thread{
         private Msg.HandShakeMsg sentHandShakeMsg = new Msg.HandShakeMsg();
         private Msg.HandShakeMsg receivedHandShakeMsg = new Msg.HandShakeMsg();
         private ActualMsg sentActualMsg;
-        private ActualMsg receivedAcutalMsg;
+        private ActualMsg receivedActualMsg;
         private Peer serverPeer;
         private String clientPeerID;
         private String serverPeerID;
@@ -72,58 +72,80 @@ public class Server extends Thread{
                         System.out.println("{Server} Receive: " + readObject.getClass().getName());
                         MsgType = readObject.getClass().getName();
                         switch (MsgType) {
+
                             case "Msg.HandShakeMsg":
 
                                 receivedHandShakeMsg = (HandShakeMsg) readObject;
-                                System.out.println("{Server} Receive HandShake message " + receivedHandShakeMsg.getHandShakeHeader()
+                                System.out.println("\n" + "{Server} Receive HandShake message " + receivedHandShakeMsg.getHandShakeHeader()
                                         + "from Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()));
                                 this.clientPeerID = receivedHandShakeMsg.getPeerID();
 
                                 // send HandShakeMsg back
                                 sentHandShakeMsg.setPeerID(this.serverPeerID);
                                 System.out.println("{Server} Send HandShake message from Server " + this.serverPeerID
-                                        + "to Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()));
+                                        + "to Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()) + "\n");
                                 this.sendHandShakeMsg(sentHandShakeMsg);
                                 break;
 
-                            case "Msg.BitFieldMsg":// receive Bitfield Msg and send its bitfield Msg back to the Client.
+                            case "Msg.BitFieldMsg":
 
-                                receivedAcutalMsg = (BitFieldMsg) readObject;
-                                System.out.println("{Server} Receive BitFieldMsg from Client " + this.clientPeerID
-                                        + " to Server " + this.serverPeerID);
-                                // not update bitFieldNeighbor
+                                receivedActualMsg = (BitFieldMsg) readObject;
+                                    System.out.println("\n" + "{Server} Receive BitFieldMsg from Client " + this.clientPeerID
+                                            + " to Server " + this.serverPeerID);
 
-                                if(serverPeer.isHasPieces()){
-                                    //if the server has some pieces
-                                    sentActualMsg = new BitFieldMsg(serverPeer.getNumOfPiece());
-                                    sentActualMsg.setMessagePayload(sentActualMsg.booleanArray2byteArray(serverPeer.getBitFieldSelf()));
-                                    this.sendActualMsg(sentActualMsg);
-                                    System.out.println("{Server} Send BitFieldMsg from Server " + this.serverPeerID
-                                        + " back to Client " + this.clientPeerID);
+                                if(serverPeer.isHasReceivedBitFieldMsgOnce()){
+                                    // receive BitField Msg for the first time and send its bitfield Msg back by using the client of this peer
+
+                                    serverPeer.setHasReceivedBitFieldMsgOnce();// set HasReceivedBitFieldMsgOnce
+
+                                    if(serverPeer.isHasPieces()){
+                                        //if the server has some pieces
+                                        sentActualMsg = new BitFieldMsg(serverPeer.getNumOfPiece());
+                                        sentActualMsg.setMessagePayload(sentActualMsg.booleanArray2byteArray(serverPeer.getBitFieldSelf()));
+                                        serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
+                                        System.out.println("{Server} Send BitFieldMsg from Client " + this.serverPeerID
+                                            + " back to Server " + this.clientPeerID + "\n");
+                                    }
+                                }else {
+                                    // receive BitField Msg for the second time, so send InterestedMsg or NotInterestedMsg
+
+                                    //add the bitField of clientPeer into the bitFieldNeighbors
+                                    serverPeer.addBitFieldNeighbor(serverPeerID, receivedActualMsg.byteArray2booleanArray(receivedActualMsg.getMessagePayload()));
+                                    // send InterestedMsg or NotInterestedMsg
+                                    if(serverPeer.isInterested(serverPeerID)){
+                                        sentActualMsg = new InterestedMsg();
+                                        serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
+                                    }else {
+                                        sentActualMsg = new NotInterestedMsg();
+                                        serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
+                                    }
+                                    System.out.println("{Server} Send BitFieldMsg from Client " + this.serverPeerID
+                                            + " back to Server " + this.clientPeerID + "\n");
                                 }
                                 break;
 
                             case "Msg.HaveMsg":
-                                receivedAcutalMsg = (HaveMsg) readObject;
-                                System.out.println("{Server} Receive HaveMsg from Client " + this.clientPeerID
+                                receivedActualMsg = (HaveMsg) readObject;
+                                System.out.println("\n" + "{Server} Receive HaveMsg from Client " + this.clientPeerID
                                         + " to Server " + this.serverPeerID);
-                                indexOfPiece = receivedAcutalMsg.parseIndexFromPieceMsg();
+                                indexOfPiece = receivedActualMsg.parseIndexFromPieceMsg();
                                 // update the bitFieldNeighbor
                                 serverPeer.updateBitFieldNeighbor(this.clientPeerID, serverPeer.byteArray2int(indexOfPiece));
                                 // send InterestedMsg or NotInterestedMsg
                                 if(serverPeer.isInterested(clientPeerID)){
                                     sentActualMsg = new InterestedMsg();
-                                    // call the client of this peer to send InterestedMsg
                                     serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
                                 }else {
                                     sentActualMsg = new NotInterestedMsg();
                                     serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
                                 }
+                                System.out.println("{Server} Send BitFieldMsg from Client " + this.serverPeerID
+                                            + " back to Server " + this.clientPeerID + "\n");
                                 break;
 
                             case "Msg.InterestedMsg":
-                                receivedAcutalMsg = (InterestedMsg) readObject;
-                                System.out.println("{Server} Receive InterestedMsg from Client " + this.clientPeerID
+                                receivedActualMsg = (InterestedMsg) readObject;
+                                System.out.println("\n" + "{Server} Receive InterestedMsg from Client " + this.clientPeerID
                                         + " to Server " + this.serverPeerID);
                                 // add ClientPeer into InterestedList
                                 serverPeer.addInterestedList(this.clientPeerID);
@@ -135,23 +157,48 @@ public class Server extends Thread{
                                 break;
 
                             case "Msg.NotInterestedMsg":
-                                receivedAcutalMsg = (NotInterestedMsg) readObject;
-                                System.out.println("{Server} Receive NotInterestedMsg from Client " + this.clientPeerID
+                                receivedActualMsg = (NotInterestedMsg) readObject;
+                                System.out.println("\n" + "{Server} Receive NotInterestedMsg from Client " + this.clientPeerID
                                         + " to Server " + this.serverPeerID);
-                                System.out.println("{Server} No action required. ");
+                                System.out.println("{Server} No action required. " + "\n");
                                 break;
 
                             case "Msg.RequestMsg":
-                                receivedAcutalMsg = (RequestMsg) readObject;
-                                System.out.println("{Server} Receive RequestedMsg from Client " + this.clientPeerID
+                                receivedActualMsg = (RequestMsg) readObject;
+                                System.out.println("\n" + "{Server} Receive RequestedMsg from Client " + this.clientPeerID
                                         + " to Server " + this.serverPeerID);
-                                indexOfPiece = receivedAcutalMsg.parseIndexFromPieceMsg();
+                                indexOfPiece = receivedActualMsg.parseIndexFromPieceMsg();
                                 if(serverPeer.getBitFieldSelf()[serverPeer.byteArray2int(indexOfPiece)]){
                                     // if serverPeer has the requested piece, send pieceMsg to the Client
                                     sentActualMsg = new PieceMsg();
                                     // to be done, set pieceMsg bitField, --------------------------
                                     // which includes 4-bytes index and corresponding piece of document.------------------
+                                    serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
+                                    System.out.println("{Server} Send PieceMsg from Client " + this.serverPeerID
+                                            + " back to Server " + this.clientPeerID + "\n");
 
+                                }
+                                break;
+                            case "Msg.PieceMsg":
+
+                                receivedActualMsg = (PieceMsg) readObject;
+                                System.out.println("\n" + "{Server} Receive PieceMsg from Client " + this.clientPeerID + " to Client" + this.serverPeerID);
+
+                                //update the bitField of the clientPeer in the bitFieldSelf
+                                indexOfPiece = receivedActualMsg.parseIndexFromPieceMsg();
+                                serverPeer.setBitFieldSelfOneBit(serverPeer.byteArray2int(indexOfPiece));
+
+                                // set HaveMsg payload field
+                                sentActualMsg = new HaveMsg();
+                                sentActualMsg.setMessagePayload(indexOfPiece);
+
+                                // send HaveMsg to all neighbors
+                                for(Map.Entry<String, Client> entry : serverPeer.getClientThreadMap().entrySet()){
+                                    Client client = entry.getValue();
+                                    String destinationPeerID = entry.getKey();
+                                    client.sendActualMsg(sentActualMsg);
+                                    System.out.println("{Client} Send HaveMsg from Client " + this.serverPeerID
+                                            + " to Server " + destinationPeerID + "\n");
                                 }
                                 break;
                         }
@@ -198,18 +245,21 @@ public class Server extends Thread{
             }
         }
         /***
-         * send Actual Msg include 8 different kinds of Msgs via socket
-         * @param actualMsg
+         * block sendActualMsg, since every time send ActualMsg, need we to send it through the client of this Peer!!!
          */
-        public void sendActualMsg(ActualMsg actualMsg){
-            try {
-                out.writeObject(actualMsg);
-                out.flush();
-            }
-            catch (IOException ioException){
-                ioException.printStackTrace();
-            }
-        }
+//        /***
+//         * send Actual Msg include 8 different kinds of Msgs via socket
+//         * @param actualMsg
+//         */
+//        public void sendActualMsg(ActualMsg actualMsg){
+//            try {
+//                out.writeObject(actualMsg);
+//                out.flush();
+//            }
+//            catch (IOException ioException){
+//                ioException.printStackTrace();
+//            }
+//        }
 
     }
 
