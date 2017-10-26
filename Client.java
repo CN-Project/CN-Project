@@ -39,7 +39,7 @@ public class Client extends Thread{
         this.serverPeerAddr = serverPeer.getHostName();
         this.hasFileOrNot = clientPeer.getHasFileOrNot();
 //        this.listeningPort = serverPeer.getListeningPort();
-        this.listeningPort = "8000";
+        this.listeningPort = serverPeer.getListeningPort();
         if(this.hasFileOrNot){
             //set all bits of bitfield 1
             clientPeer.setBitFieldSelfAllOne();
@@ -49,8 +49,8 @@ public class Client extends Thread{
     public void run(){
         try{
             //initialize Socket of client
-            requestSocket = new Socket(serverPeerAddr, Integer.parseInt(listeningPort));
-            System.out.println("{Client} connect to localhost at port 8000");
+            requestSocket = new Socket(serverPeerAddr, Integer.parseInt(this.listeningPort));
+            System.out.println("\n" + "{Client} connect to localhost at port " + this.listeningPort);
             //initialize outputstream and inputstream
             out = new ObjectOutputStream(requestSocket.getOutputStream());
             out.flush();
@@ -70,16 +70,17 @@ public class Client extends Thread{
                 System.out.println("{Client} Receive handshake message " + receivedHandShakeMsg.getHandShakeHeader() + "from Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()));
 
                 if(receivedHandShakeMsg.getPeerID() == this.serverPeerID){
-                    System.out.println("{Client} HandShake succeed! ");
+                    System.out.println("{Client} HandShake succeed!" + "\n");
                 }
             }
 
             //2. send bitfield Msg to server
             sentActualMsg = new BitFieldMsg(clientPeer.getNumOfPiece());
-            System.out.println("{Client} set the bitfield of BitfieldMsg.");
+            System.out.println("\n" + "{Client} set the bitfield of BitfieldMsg.");
             sentActualMsg.setMessagePayload(sentActualMsg.booleanArray2byteArray(clientPeer.getBitFieldSelf()));
-            System.out.println("{Client} sent bitfieldMsg from Client " + this.clientPeerId + "to Client " + this.serverPeerID);
             sendActualMsg(sentActualMsg);
+            System.out.println("{Client} sent bitfieldMsg from Client " + this.clientPeerId
+                    + "to Client " + this.serverPeerID + "\n");
 
 //            // enter while loop and wait various kinds of Msg from neighbors
 //            while(true){
