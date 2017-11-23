@@ -63,6 +63,8 @@ public class Server extends Thread{
 
         public void run(){
             try {
+                //
+                boolean HandShakeReceiver = false;
                 //initialize Input and Output streams
                 out = new ObjectOutputStream(socket.getOutputStream());
                 out.flush();
@@ -86,19 +88,15 @@ public class Server extends Thread{
                                 System.out.println("{Server} Send HandShake message from Server " + this.serverPeerID
                                         + "to Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()) + "\n");
                                 this.sendHandShakeMsg(sentHandShakeMsg);
+                                HandShakeReceiver = true;
                                 break;
 
                             case "Msg.BitFieldMsg":
-
                                 receivedActualMsg = (BitFieldMsg) readObject;
                                     System.out.println("\n" + "{Server} Receive BitFieldMsg from Client " + this.clientPeerID
                                             + " to Server " + this.serverPeerID);
 
-                                if(serverPeer.isHasReceivedBitFieldMsgOnce()){
-                                    // receive BitField Msg for the first time and send its bitfield Msg back by using the client of this peer
-
-                                    serverPeer.setHasReceivedBitFieldMsgOnce();// set HasReceivedBitFieldMsgOnce
-
+                                if(HandShakeReceiver){
                                     if(serverPeer.isHasPieces()){
                                         //if the server has some pieces
                                         sentActualMsg = new BitFieldMsg(serverPeer.getNumOfPiece());
@@ -116,12 +114,14 @@ public class Server extends Thread{
                                     if(serverPeer.isInterested(serverPeerID)){
                                         sentActualMsg = new InterestedMsg();
                                         serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
+                                        System.out.println("{Server} Send InterestedMsg from Client " + this.serverPeerID
+                                            + " back to Server " + this.clientPeerID + "\n");
                                     }else {
                                         sentActualMsg = new NotInterestedMsg();
                                         serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
-                                    }
-                                    System.out.println("{Server} Send BitFieldMsg from Client " + this.serverPeerID
+                                        System.out.println("{Server} Send NotInterestedMsg from Client " + this.serverPeerID
                                             + " back to Server " + this.clientPeerID + "\n");
+                                    }
                                 }
                                 break;
 
@@ -133,15 +133,17 @@ public class Server extends Thread{
                                 // update the bitFieldNeighbor
                                 serverPeer.updateBitFieldNeighbor(this.clientPeerID, serverPeer.byteArray2int(indexOfPiece));
                                 // send InterestedMsg or NotInterestedMsg
-                                if(serverPeer.isInterested(clientPeerID)){
-                                    sentActualMsg = new InterestedMsg();
-                                    serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
-                                }else {
-                                    sentActualMsg = new NotInterestedMsg();
-                                    serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
-                                }
-                                System.out.println("{Server} Send BitFieldMsg from Client " + this.serverPeerID
+                                if(serverPeer.isInterested(serverPeerID)){
+                                        sentActualMsg = new InterestedMsg();
+                                        serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
+                                        System.out.println("{Server} Send InterestedMsg from Client " + this.serverPeerID
                                             + " back to Server " + this.clientPeerID + "\n");
+                                    }else {
+                                        sentActualMsg = new NotInterestedMsg();
+                                        serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
+                                        System.out.println("{Server} Send NotInterestedMsg from Client " + this.serverPeerID
+                                            + " back to Server " + this.clientPeerID + "\n");
+                                    }
                                 break;
 
                             case "Msg.InterestedMsg":
@@ -218,9 +220,10 @@ public class Server extends Thread{
                                 System.out.println("{Server} Receive UnChokeMsg from Client " + this.clientPeerID
                                         + " to Server " + this.serverPeerID);
                                 if(isChoked) {
-                                    int index = this.serverPeer.getPieceIndex(this.clientPeerID);
-                                    this.serverPeer.getClientThreadMap().get(this.clientPeerID).sendActualMsg(new RequestMsg(ByteBuffer.allocate(4).putInt(index).array()));
-                                    this.serverPeer.addUnchokedByOtherList(this.clientPeerID);
+                                    int index = this.serverPeer.getAPieceIndex(this.clientPeerID);
+                                    this.serverPeer.getClientThreadMap().get(this.clientPeerID).sendActualMsg(
+                                            new RequestMsg(ByteBuffer.allocate(4).putInt(index).array()));
+                                    this.serverPeer.addUnchokedList(this.clientPeerID);
                                     break;
                                 }
                         }
