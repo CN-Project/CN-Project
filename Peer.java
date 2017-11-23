@@ -65,11 +65,6 @@ public class Peer {
     public void removeFromUnchokedByOtherList(String id) {
         unchokedByOtherList.remove(id);
     }
-    /** return a index based on the bitmap */
-    // Xiyao
-    public int getPieceIndex(String peerId) {
-        return 0;
-    }
 
     /** List stores the other peers have unchoked this peer*/
     private Set<String> unchokedByOtherList = new HashSet<>();
@@ -237,9 +232,9 @@ public class Peer {
      * compare the bitfield of curpeer with bitfield of serverpeer to determine whether it have interested piece or not
      * @return (boolean) interested or not interested
      */
-    public boolean isInterested(String serverPeerID){
+    public boolean isInterested(String peerId){
         boolean[] bitFieldSelf = this.bitFieldSelf;
-        boolean[] bitFieldNeighbor = this.bitFieldNeighbor.get(serverPeerID);
+        boolean[] bitFieldNeighbor = this.bitFieldNeighbor.get(peerId);
         for(int i = 0; i < bitFieldSelf.length; i++){
             if(!bitFieldSelf[i] && bitFieldNeighbor[i]){
                 return true;
@@ -260,5 +255,21 @@ public class Peer {
             val=val|(bytes[i] & 0xFF);
         }
         return val;
+    }
+
+    /***
+     *  choose a piece current peer need to download from other peer
+     * @param peerId
+     * @return piece index, return -1 if other peer don't have it
+     */
+    public int getAPieceIndex(String peerId){
+        boolean[] bitFieldSelf = this.bitFieldSelf;
+        boolean[] bitFieldNeighbor = this.bitFieldNeighbor.get(peerId);
+        for(int i = 0; i < bitFieldSelf.length; i++){
+            if(!bitFieldSelf[i] && bitFieldNeighbor[i]){
+                return i;
+            }
+        }
+        return -1;
     }
 }

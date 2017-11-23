@@ -15,7 +15,7 @@ public class Client extends Thread{
     private ObjectOutputStream out;
     private String MsgType;
 
-    private String clientPeerId;
+    private String clientPeerID;
     private String serverPeerID;
     private String serverPeerAddr;
     private String listeningPort;
@@ -34,7 +34,7 @@ public class Client extends Thread{
     public Client(Peer clientPeer, Peer serverPeer){
         this.clientPeer = clientPeer;
         this.serverPeer = serverPeer;
-        this.clientPeerId = clientPeer.getPeerId();
+        this.clientPeerID = clientPeer.getPeerId();
         this.serverPeerID = serverPeer.getPeerId();
         this.serverPeerAddr = serverPeer.getHostName();
         this.hasFileOrNot = clientPeer.getHasFileOrNot();
@@ -56,9 +56,9 @@ public class Client extends Thread{
             out.flush();
             in = new ObjectInputStream(requestSocket.getInputStream());
 
-            //1. send handshake to server
-            sentHandShakeMsg.setPeerID(clientPeerId);
-            System.out.println("{Client} Send handshake message from Client " + this.clientPeerId + " to Server " + this.serverPeerID) ;
+            // 1. send handshake to server
+            sentHandShakeMsg.setPeerID(clientPeerID);
+            System.out.println("{Client} Send handshake message from Client " + this.clientPeerID + " to Server " + this.serverPeerID) ;
             sendHandShakeMsg(sentHandShakeMsg);
             System.out.println("{Client} Waiting Reply Handshake...");
             //read socket in
@@ -74,21 +74,39 @@ public class Client extends Thread{
                 }
             }
 
-            //2. send bitfield Msg to server
+            // 2. send bitfield Msg to server
             sentActualMsg = new BitFieldMsg(clientPeer.getNumOfPiece());
             System.out.println("\n" + "{Client} set the bitfield of BitfieldMsg.");
             sentActualMsg.setMessagePayload(sentActualMsg.booleanArray2byteArray(clientPeer.getBitFieldSelf()));
             sendActualMsg(sentActualMsg);
-            System.out.println("{Client} sent bitfieldMsg from Client " + this.clientPeerId
-                    + "to Client " + this.serverPeerID + "\n");
+            System.out.println("{Client} sent bitfieldMsg from Client " + this.clientPeerID
+                    + "to Server " + this.serverPeerID + "\n");
+            this.clientPeer.setHasSentBitfieldMsg();
 
-//            // enter while loop and wait various kinds of Msg from neighbors
-//            while(true){
+            // enter while loop and wait various kinds of Msg from neighbors
+            while(true){
 //                //read socket in
 //                readObject = in.readObject();
 //                System.out.println("{Client} Receive: " + readObject.getClass().getName());
 //                MsgType = readObject.getClass().getName();
-//            }
+//
+//                switch (MsgType){
+//
+//                    case "Msg.HandShakeMsg":
+//                        receivedHandShakeMsg = (HandShakeMsg) readObject;
+//                        System.out.println("\n" + "{Client} Receive HandShake message " + receivedHandShakeMsg.getHandShakeHeader()
+//                                + "from Server " + Integer.parseInt(receivedHandShakeMsg.getPeerID()));
+//                        this.clientPeerID = receivedHandShakeMsg.getPeerID();
+//
+//                        // send HandShakeMsg back
+//                        sentHandShakeMsg.setPeerID(this.serverPeerID);
+//                        System.out.println("{Server} Send HandShake message from Server " + this.serverPeerID
+//                                + "to Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()) + "\n");
+//                        this.sendHandShakeMsg(sentHandShakeMsg);
+//                        break;
+//
+//                }
+            }
 
 
         }
