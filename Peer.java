@@ -50,6 +50,25 @@ public class Peer {
     /** List that stores all choked peers. */
     private Set<String> chokedList = new HashSet<>();
 
+    public Set<String> getUnchokedByOtherList() {
+        return unchokedByOtherList;
+    }
+
+    public void addUnchokedByOtherList(String peerId) {
+        unchokedByOtherList.add(peerId);
+    }
+
+    public void removeFromUnchokedByOtherList(String id) {
+        unchokedByOtherList.remove(id);
+    }
+    /** return a index based on the bitmap */
+    // Xiyao
+    public int getPieceIndex(String peerId) {
+        return 0;
+    }
+
+    /** List stores the other peers have unchoked this peer*/
+    private Set<String> unchokedByOtherList = new HashSet<>();
 
 
     // Empty constructor

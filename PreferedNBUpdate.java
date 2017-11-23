@@ -4,11 +4,11 @@ import Msg.UnChokeMsg;
 import java.util.*;
 
 public class PreferedNBUpdate implements Runnable {
-    private int preferedNBNum;
+    private int preferredNBNum;
     private Peer peer = null;
     private int intervalP;
-    public PreferedNBUpdate(Peer peer, int preferedNBNum, int interval){
-        this.preferedNBNum = preferedNBNum;
+    public PreferedNBUpdate(Peer peer, int preferredNBNum, int interval){
+        this.preferredNBNum = preferredNBNum;
         this.peer = peer;
         this.intervalP = interval;
     }
@@ -54,7 +54,7 @@ public class PreferedNBUpdate implements Runnable {
         });
         for (int i = 0; i < infoIds.size(); i++) {
             String peer = infoIds.get(i).getKey();
-            if(i < preferedNBNum){
+            if(i < preferredNBNum){
                 unchokedList.add(peer);
             }
             else{

@@ -53,6 +53,7 @@ public class Server extends Thread{
         private String clientPeerID;
         private String serverPeerID;
         private byte[] indexOfPiece;
+        private boolean isChoked = true;
 
         public Handler(Socket socket, Peer serverPeer){
             this.socket = socket;
@@ -179,6 +180,7 @@ public class Server extends Thread{
 
                                 }
                                 break;
+
                             case "Msg.PieceMsg":
 
                                 receivedActualMsg = (PieceMsg) readObject;
@@ -201,6 +203,25 @@ public class Server extends Thread{
                                             + " to Server " + destinationPeerID + "\n");
                                 }
                                 break;
+
+                            case "Msg.ChokeMsg":
+                                receivedActualMsg = (ChokeMsg) readObject;
+                                System.out.println("{Server} Receive ChokeMsg from Client " + this.clientPeerID
+                                        + " to Server " + this.serverPeerID);
+                                if (this.serverPeer.getUnchokedByOtherList().contains(this.clientPeerID)) {
+                                    this.serverPeer.removeFromUnchokedByOtherList(this.clientPeerID);
+                                }
+                                break;
+                            case "Msg.UnChokeMsg":
+                                receivedActualMsg = (UnChokeMsg) readObject;
+                                System.out.println("{Server} Receive UnChokeMsg from Client " + this.clientPeerID
+                                        + " to Server " + this.serverPeerID);
+                                if(isChoked) {
+                                    int index = this.serverPeer.getPieceIndex(this.clientPeerID);
+                                    this.serverPeer.getClientThreadMap().get(this.clientPeerID).sendActualMsg(new RequestMsg(index));
+                                    this.serverPeer.addUnchokedByOtherList(this.clientPeerID);
+                                    break;
+                                }
                         }
 //                        //receive the message sent from the socket
 //                        message = (String) in.readObject();
