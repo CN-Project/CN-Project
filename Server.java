@@ -191,12 +191,20 @@ public class Server extends Thread{
                                 //update the bitField of the clientPeer in the bitFieldSelf
                                 indexOfPiece = receivedActualMsg.parseIndexFromPieceMsg();
                                 serverPeer.setBitFieldSelfOneBit(serverPeer.byteArray2int(indexOfPiece));
+                                // 1. check whether it is unchoked, if so, request another piece
+                                if(!this.isChoked){
+                                    int index = this.serverPeer.getAPieceIndex(this.clientPeerID);
+                                    if(index != -1) {
+                                        this.serverPeer.getClientThreadMap().get(this.clientPeerID).sendActualMsg(
+                                                new RequestMsg(ByteBuffer.allocate(4).putInt(index).array()));
+                                    }
+                                }
 
                                 // set HaveMsg payload field
                                 sentActualMsg = new HaveMsg();
                                 sentActualMsg.setMessagePayload(indexOfPiece);
 
-                                // send HaveMsg to all neighbors
+                                // 2. send HaveMsg to all neighbors
                                 for(Map.Entry<String, Client> entry : serverPeer.getClientThreadMap().entrySet()){
                                     Client client = entry.getValue();
                                     String destinationPeerID = entry.getKey();
