@@ -218,9 +218,10 @@ public class Server extends Thread{
                                 System.out.println("{Server} Receive UnChokeMsg from Client " + this.clientPeerID
                                         + " to Server " + this.serverPeerID);
                                 if(isChoked) {
-                                    int index = this.serverPeer.getPieceIndex(this.clientPeerID);
-                                    this.serverPeer.getClientThreadMap().get(this.clientPeerID).sendActualMsg(new RequestMsg(ByteBuffer.allocate(4).putInt(index).array()));
-                                    this.serverPeer.addUnchokedByOtherList(this.clientPeerID);
+                                    int index = this.serverPeer.getAPieceIndex(this.clientPeerID);
+                                    this.serverPeer.getClientThreadMap().get(this.clientPeerID).sendActualMsg(
+                                            new RequestMsg(ByteBuffer.allocate(4).putInt(index).array()));
+                                    this.serverPeer.addUnchokedList(this.clientPeerID);
                                     break;
                                 }
                         }
