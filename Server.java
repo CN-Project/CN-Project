@@ -220,12 +220,16 @@ public class Server extends Thread{
                                 System.out.println("{Server} Receive UnChokeMsg from Client " + this.clientPeerID
                                         + " to Server " + this.serverPeerID);
                                 if(isChoked) {
+                                    isChoked = false;
                                     int index = this.serverPeer.getAPieceIndex(this.clientPeerID);
-                                    this.serverPeer.getClientThreadMap().get(this.clientPeerID).sendActualMsg(
-                                            new RequestMsg(ByteBuffer.allocate(4).putInt(index).array()));
-                                    this.serverPeer.addUnchokedList(this.clientPeerID);
-                                    break;
+                                    if(index != -1) {
+                                        this.serverPeer.getClientThreadMap().get(this.clientPeerID).sendActualMsg(
+                                                new RequestMsg(ByteBuffer.allocate(4).putInt(index).array()));
+                                        this.serverPeer.addUnchokedList(this.clientPeerID);
+                                    }
+
                                 }
+                                break;
                         }
 //                        //receive the message sent from the socket
 //                        message = (String) in.readObject();
