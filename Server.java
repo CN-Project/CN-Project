@@ -54,6 +54,7 @@ public class Server extends Thread{
         private String serverPeerID;
         private byte[] indexOfPiece;
         private boolean isChoked = true;
+        private boolean HandShakeReceiver = false;
 
         public Handler(Socket socket, Peer serverPeer){
             this.socket = socket;
@@ -63,8 +64,6 @@ public class Server extends Thread{
 
         public void run(){
             try {
-                // handShakereceiver
-                boolean HandShakeReceiver = false;
                 //initialize Input and Output streams
                 out = new ObjectOutputStream(socket.getOutputStream());
                 out.flush();
@@ -88,7 +87,7 @@ public class Server extends Thread{
                                 System.out.println("{Server} Send HandShake message from Server " + this.serverPeerID
                                         + "to Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()) + "\n");
                                 this.sendHandShakeMsg(sentHandShakeMsg);
-                                HandShakeReceiver = true;
+                                this.HandShakeReceiver = true;
                                 break;
 
                             case "Msg.BitFieldMsg":
@@ -96,7 +95,7 @@ public class Server extends Thread{
                                     System.out.println("\n" + "{Server} Receive BitFieldMsg from Client " + this.clientPeerID
                                             + " to Server " + this.serverPeerID);
 
-                                if(HandShakeReceiver){
+                                if(this.HandShakeReceiver){
                                     if(serverPeer.isHasPieces()){
                                         //if the server has some pieces
                                         sentActualMsg = new BitFieldMsg(serverPeer.getNumOfPiece());
