@@ -45,6 +45,13 @@ public class PeerProcess {
         process.setupConnection(process.peerList);
         process.createServer();
 
+        /** Run preferred & optimistic neighbors update */
+        PreferredNBUpdate preferredNB = new PreferredNBUpdate(process.inputPeer, 3, 6);
+        preferredNB.run();
+
+        OptimisticNBUpdate optimisticNB = new OptimisticNBUpdate(process.inputPeer, 6);
+        optimisticNB.run();
+
         /** Create the file directory, if the input peer contains all file, split it into pieces. */
 //        process.fileHandling();
 

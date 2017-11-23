@@ -30,9 +30,6 @@ public class Peer {
     /** Store downloaded file pieces in fileStore[int index][byte[] content]. */
     private byte[][] fileStore;
 
-    /** A peer will keep its own bitfield info and neighbors' bitfield info, and its interested list */
-    private Set<String> interestedList = new HashSet<>();
-
     /** A map store all other peers' bitfield array. */
     private Map<String, boolean[]> bitFieldNeighbor = new HashMap<>();
 
@@ -48,29 +45,8 @@ public class Peer {
     /** List that stores all choked peers. */
     private Set<String> chokedList = new HashSet<>();
 
-    public Set<String> getUnchokedByOtherList() {
-        return unchokedByOtherList;
-    }
-
-    public void addUnchokedByOtherList(String peerId) {
-        unchokedByOtherList.add(peerId);
-    }
-
-    public void addUnchokedList(String peerId) {
-        unchokedList.add(peerId);
-    }
-
-    public void removeFromUnchokedList(String id) {
-        unchokedList.remove(id);
-    }
-
-    public void removeFromUnchokedByOtherList(String id) {
-        unchokedByOtherList.remove(id);
-    }
-
-    /** List stores the other peers have unchoked this peer*/
-    private Set<String> unchokedByOtherList = new HashSet<>();
-
+    /** A peer will keep its own bitfield info and neighbors' bitfield info, and its interested list */
+    private Set<String> interestedList = new HashSet<>();
 
     // Empty constructor
     public Peer(){}
@@ -161,6 +137,14 @@ public class Peer {
 
     public void setChokedList(Set<String> chokedList) {
         this.chokedList = chokedList;
+    }
+
+    public void addUnchokedList(String peerId) {
+        unchokedList.add(peerId);
+    }
+
+    public void removeFromUnchokedList(String id) {
+        unchokedList.remove(id);
     }
 
     /**

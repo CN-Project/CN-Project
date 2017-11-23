@@ -153,11 +153,6 @@ public class Server extends Thread{
                                         + " to Server " + this.serverPeerID);
                                 // add ClientPeer into InterestedList
                                 serverPeer.addInterestedList(this.clientPeerID);
-                                // decide k preferred neighbors
-                                /***
-                                 *  Zheng Feng Part
-                                 */
-
                                 break;
 
                             case "Msg.NotInterestedMsg":

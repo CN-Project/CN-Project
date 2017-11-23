@@ -3,11 +3,11 @@ import Msg.UnChokeMsg;
 
 import java.util.*;
 
-public class PreferedNBUpdate implements Runnable {
+public class PreferredNBUpdate implements Runnable {
     private int preferredNBNum;
     private Peer peer = null;
     private int intervalP;
-    public PreferedNBUpdate(Peer peer, int preferredNBNum, int interval){
+    public PreferredNBUpdate(Peer peer, int preferredNBNum, int interval){
         this.preferredNBNum = preferredNBNum;
         this.peer = peer;
         this.intervalP = interval;
@@ -16,7 +16,7 @@ public class PreferedNBUpdate implements Runnable {
     public void run() {
         while(true){
             long t1 = new Date().getTime();
-            updatePreferNB();
+            updatePreferedNB();
             long t2 = new Date().getTime();
             long waitTime = intervalP*1000 - (t2 - t1);
             try {
@@ -28,7 +28,7 @@ public class PreferedNBUpdate implements Runnable {
         }
     }
 
-    private void updatePreferNB(){
+    private void updatePreferedNB(){
         HashMap<String, Integer> downloadMap = peer.getDownloadRateMap();
         HashMap<String, Integer> interestedNBMap = new HashMap<>();
         Set<String> interestedList = peer.getInterestedList();
