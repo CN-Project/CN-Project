@@ -58,6 +58,10 @@ public class Peer {
         unchokedByOtherList.add(peerId);
     }
 
+    public void removeFromUnchokedList(String id) {
+        unchokedList.remove(id);
+    }
+
     public void removeFromUnchokedByOtherList(String id) {
         unchokedByOtherList.remove(id);
     }

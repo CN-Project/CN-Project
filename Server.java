@@ -208,8 +208,9 @@ public class Server extends Thread{
                                 receivedActualMsg = (ChokeMsg) readObject;
                                 System.out.println("{Server} Receive ChokeMsg from Client " + this.clientPeerID
                                         + " to Server " + this.serverPeerID);
-                                if (this.serverPeer.getUnchokedByOtherList().contains(this.clientPeerID)) {
-                                    this.serverPeer.removeFromUnchokedByOtherList(this.clientPeerID);
+                                this.isChoked = true;
+                                if (this.serverPeer.getUnchokedList().contains(this.clientPeerID)) {
+                                    this.serverPeer.removeFromUnchokedList(this.clientPeerID);
                                 }
                                 break;
                             case "Msg.UnChokeMsg":
@@ -218,7 +219,7 @@ public class Server extends Thread{
                                         + " to Server " + this.serverPeerID);
                                 if(isChoked) {
                                     int index = this.serverPeer.getPieceIndex(this.clientPeerID);
-                                    this.serverPeer.getClientThreadMap().get(this.clientPeerID).sendActualMsg(new RequestMsg(index));
+                                    this.serverPeer.getClientThreadMap().get(this.clientPeerID).sendActualMsg(new RequestMsg(ByteBuffer.allocate(4).putInt(index).array()));
                                     this.serverPeer.addUnchokedByOtherList(this.clientPeerID);
                                     break;
                                 }
