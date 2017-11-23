@@ -98,6 +98,8 @@ public class Server extends Thread{
                                 if(this.HandShakeReceiver){
                                     if(serverPeer.isHasPieces()){
                                         //if the server has some pieces
+                                        //add the bitField of clientPeer into the bitFieldNeighbors
+                                    serverPeer.addBitFieldNeighbor(serverPeerID, receivedActualMsg.byteArray2booleanArray(receivedActualMsg.getMessagePayload()));
                                         sentActualMsg = new BitFieldMsg(serverPeer.getNumOfPiece());
                                         sentActualMsg.setMessagePayload(sentActualMsg.booleanArray2byteArray(serverPeer.getBitFieldSelf()));
                                         serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
