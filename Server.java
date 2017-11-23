@@ -63,7 +63,7 @@ public class Server extends Thread{
 
         public void run(){
             try {
-                //
+                // handShakereceiver
                 boolean HandShakeReceiver = false;
                 //initialize Input and Output streams
                 out = new ObjectOutputStream(socket.getOutputStream());
