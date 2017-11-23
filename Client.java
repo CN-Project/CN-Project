@@ -81,7 +81,6 @@ public class Client extends Thread{
             sendActualMsg(sentActualMsg);
             System.out.println("{Client} sent bitfieldMsg from Client " + this.clientPeerID
                     + "to Server " + this.serverPeerID + "\n");
-            this.clientPeer.setHasSentBitfieldMsg();
 
             // enter while loop and wait various kinds of Msg from neighbors
             while(true){
