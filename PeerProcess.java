@@ -173,7 +173,7 @@ public class PeerProcess {
                 byte[] bytes = new byte[1024];
                 int len = -1;
                 for (int i = 1; i <= numOfPiece; i++) {
-                    File pieceFile = new File(peerDirectoryFile.getAbsolutePath() + "/Pieces/" + i + ".data");
+                    File pieceFile = new File(peerDirectoryFile.getAbsolutePath() + "/Pieces/" + i + ".dat");
                     RandomAccessFile rafout = new RandomAccessFile(pieceFile, "rw");
 
                     while ((len = raf.read(bytes)) != -1) {
@@ -198,5 +198,42 @@ public class PeerProcess {
         }
     }
 
+
+    /**
+     * Function used to merge files, when this peer has received all pieces, use mergeFile to merge into the complete one.
+     */
+    public void mergeFiles() {
+        if (this.inputPeer.getPeerId().equals("1001")) {
+            return;
+        }
+
+        File peerDirectoryFile = new File("peer_" + this.inputPeer.getPeerId());
+        String path = peerDirectoryFile.getAbsolutePath();
+        File targetFile = new File(path + "/" + this.CommonCfgMap.get("FileName"));
+
+        int fileSize = Integer.parseInt(this.CommonCfgMap.get("FileSize"));
+        int pieceSize = Integer.parseInt(this.CommonCfgMap.get("PieceSize"));
+        int numOfPiece = (int) Math.ceil((double) fileSize / (double) pieceSize);
+
+        try {
+            RandomAccessFile target = new RandomAccessFile(targetFile, "rw");
+            for (int i = 1; i <= numOfPiece; i++) {
+                File file = new File(path + "/" + i + ".dat");
+                RandomAccessFile pieceFile = new RandomAccessFile(file, "r");
+                byte[] bytes = new byte[1024];
+                int len = -1;
+
+                while ((len = pieceFile.read(bytes)) != -1) {
+                    target.write(bytes, 0, len);
+                }
+                pieceFile.close();
+            }
+            target.close();
+        } catch (FileNotFoundException fne) {
+            fne.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
 
 }
