@@ -36,7 +36,9 @@ Peer.class
     	public Peer(){}
     	public Peer(int numOfPiece) {}
     	public Peer(String peerId, String hostName, String listeningPort, boolean hasFileOrNot, int numOfPiece) {}
-    Size:
+    
+
+Size:
         numOfPiece.size = 306;
         fileStore.size = 306;
         bitfield.size = 312;

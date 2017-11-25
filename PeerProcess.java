@@ -3,6 +3,7 @@ import Msg.*;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.RandomAccess;
 
 /**
  * Created by jiantaozhang on 2017/10/22.
@@ -42,18 +43,20 @@ public class PeerProcess {
         System.out.println("Start to join input peer into whole network......" + "\n");
         String inputPeerID = args[0];
         process.inputPeer = process.peerList.get(inputPeerID);
-        process.setupConnection(process.peerList);
-        process.createServer();
 
-        /** Run preferred & optimistic neighbors update */
+        // Connect this peer to all former peers, this peer set as client
+        process.setupConnection(process.peerList);
+        // Setup this peer as a server
+        process.createServer();
+        // Create peer subdirectory, if this peer is the first peer, split file into pieces.
+        process.fileHandling();
+
+        // Run preferred & optimistic neighbors update
         PreferredNBUpdate preferredNB = new PreferredNBUpdate(process.inputPeer, 3, 6);
         preferredNB.run();
 
         OptimisticNBUpdate optimisticNB = new OptimisticNBUpdate(process.inputPeer, 6);
         optimisticNB.run();
-
-        /** Create the file directory, if the input peer contains all file, split it into pieces. */
-//        process.fileHandling();
 
     }
 
@@ -117,7 +120,7 @@ public class PeerProcess {
 
 
     /**
-     * Setup connection to the former peers of this peer.
+     * Setup connection to all former peers of this peer.
      * @param peerList
      */
     public void setupConnection(Map<String, Peer> peerList) {
@@ -144,7 +147,8 @@ public class PeerProcess {
 
 
     /**
-     * Create file handler for this input peer, if this peer contains all file, split file into pieces.
+     * Create file handler for this input peer, if this peer contains all file, split file into pieces,
+     * and set this peer's bitFiled to all one.
      */
     public void fileHandling() {
 
@@ -152,16 +156,44 @@ public class PeerProcess {
         File peerDirectoryFile = new File(peerDirectory);
 
         if (this.inputPeer.getHasFileOrNot()) {
+            // If this peer is the first peer, make it a "Pieces" directory, split file and store pieces in it.
+
             String fileName = this.CommonCfgMap.get("FileName");
             File completeFile = new File(peerDirectoryFile.getAbsolutePath() + "/" + fileName);
+            File pieceDirct = new File(peerDirectoryFile.getAbsolutePath() + "/Pieces");
+            pieceDirct.mkdir();
+
+            int fileSize = Integer.parseInt(this.CommonCfgMap.get("FileSize"));
+            int pieceSize = Integer.parseInt(this.CommonCfgMap.get("PieceSize"));
+            int numOfPiece = (int) Math.ceil((double) fileSize / (double) pieceSize);
+            long lon = completeFile.length() / (long) numOfPiece + 1L;
+
             try {
-                BufferedInputStream input = new BufferedInputStream(new FileInputStream(completeFile));
-                // Cut into pieces
+                RandomAccessFile raf = new RandomAccessFile(completeFile, "r");
+                byte[] bytes = new byte[1024];
+                int len = -1;
+                for (int i = 1; i <= numOfPiece; i++) {
+                    File pieceFile = new File(peerDirectoryFile.getAbsolutePath() + "/Pieces/" + i + ".data");
+                    RandomAccessFile rafout = new RandomAccessFile(pieceFile, "rw");
+
+                    while ((len = raf.read(bytes)) != -1) {
+                        rafout.write(bytes, 0, len);
+                        if (rafout.length() > lon) {
+                            break;
+                        }
+                    }
+                    rafout.close();
+                }
+                raf.close();
             } catch (FileNotFoundException fne) {
                 System.out.println("Cannot find the complete file, please check it first");
+                fne.printStackTrace();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
             }
             this.inputPeer.setBitFieldSelfAllOne();
         } else {
+            // If this peer is not the first peer, make a directory to store files.
             peerDirectoryFile.mkdir();
         }
     }
