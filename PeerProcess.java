@@ -160,8 +160,6 @@ public class PeerProcess {
 
             String fileName = this.CommonCfgMap.get("FileName");
             File completeFile = new File(peerDirectoryFile.getAbsolutePath() + "/" + fileName);
-            File pieceDirct = new File(peerDirectoryFile.getAbsolutePath() + "/Pieces");
-            pieceDirct.mkdir();
 
             int fileSize = Integer.parseInt(this.CommonCfgMap.get("FileSize"));
             int pieceSize = Integer.parseInt(this.CommonCfgMap.get("PieceSize"));
@@ -173,7 +171,7 @@ public class PeerProcess {
                 byte[] bytes = new byte[1024];
                 int len = -1;
                 for (int i = 1; i <= numOfPiece; i++) {
-                    File pieceFile = new File(peerDirectoryFile.getAbsolutePath() + "/Pieces/" + i + ".dat");
+                    File pieceFile = new File(peerDirectoryFile.getAbsolutePath() + "/" + i + ".dat");
                     RandomAccessFile rafout = new RandomAccessFile(pieceFile, "rw");
 
                     while ((len = raf.read(bytes)) != -1) {
