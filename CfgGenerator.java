@@ -1,4 +1,6 @@
 import java.io.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * Created by jiantaozhang on 2017/10/20.
@@ -28,9 +30,15 @@ public class CfgGenerator {
         if (peerInfo.exists()) {
             peerInfo.delete();
         }
-        cfg.writePeerInfo(1001, "lin114-00-cise.ufl.edu", 6008, 1);
-        for (int i = 1; i <= 5; i++) {
-            cfg.writePeerInfo(1001 + i, "lin114-0" + i + "-cise.ufl.edu", 6008, 0);
+
+        try {
+            String addr = InetAddress.getLocalHost().getHostAddress();
+            cfg.writePeerInfo(1001, addr, "6008", 1);
+            for (int i = 1; i < 6; i++) {
+                cfg.writePeerInfo(1001 + i, addr, 6008 + i + "", 0);
+            }
+        } catch (UnknownHostException uhe) {
+            uhe.printStackTrace();
         }
     }
     /**
@@ -68,7 +76,7 @@ public class CfgGenerator {
     /**
      *Write PeerInfo.cfg using specific parameters
      */
-    public void writePeerInfo(int peerID, String hostName, int listeningPort, int hasFileOrNot) {
+    public void writePeerInfo(int peerID, String hostName, String listeningPort, int hasFileOrNot) {
         try {
             FileWriter out = new FileWriter(new File("PeerInfo.cfg"), true);
             out.write(peerID + " " + hostName + " " + listeningPort + " " + hasFileOrNot + "\n");
