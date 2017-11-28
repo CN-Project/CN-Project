@@ -27,9 +27,9 @@ public class PeerProcess {
     public static void main(String[] args) {
 
         PeerProcess process = new PeerProcess();
-        CfgGenerator cfgGenerator = new CfgGenerator();
-        cfgGenerator.run();
-        System.out.println("Successfully generate configuration files......" + "\n");
+//        CfgGenerator cfgGenerator = new CfgGenerator();
+//        cfgGenerator.run();
+//        System.out.println("Successfully generate configuration files......" + "\n");
 
 
         /** Get common configuration info and store in a map*/
@@ -46,13 +46,14 @@ public class PeerProcess {
         System.out.println("Start to join input peer into whole network......" + "\n");
         String inputPeerID = args[0];
         process.inputPeer = process.peerList.get(inputPeerID);
+        process.inputPeer.setPeerList(process.peerList);
 
         // Connect this peer to all former peers, this peer set as client
         process.setupConnection(process.peerList);
         // Setup this peer as a server
         process.createServer();
         // Create peer subdirectory, if this peer is the first peer, split file into pieces.
-        process.fileHandling();
+//        process.fileHandling();
 
         // Run preferred & optimistic neighbors update
         PreferredNBUpdate preferredNB = new PreferredNBUpdate(process.inputPeer, 3, 6);
@@ -146,6 +147,7 @@ public class PeerProcess {
     /** Creat a server thread for this input peer, keep its socket running. */
     public void createServer() {
         new Thread(new Server(this.inputPeer)).start();
+
     }
 
 
@@ -168,7 +170,6 @@ public class PeerProcess {
             int pieceSize = Integer.parseInt(this.CommonCfgMap.get("PieceSize"));
             int numOfPiece = (int) Math.ceil((double) fileSize / (double) pieceSize);
             long lon = completeFile.length() / (long) numOfPiece + 1L;
-
             try {
                 RandomAccessFile raf = new RandomAccessFile(completeFile, "r");
                 byte[] bytes = new byte[1024];

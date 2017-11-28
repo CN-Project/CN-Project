@@ -29,8 +29,8 @@ public class PreferredNBUpdate implements Runnable {
     }
 
     private void updatePreferedNB(){
-        HashMap<String, Integer> downloadMap = peer.getDownloadRateMap();
-        HashMap<String, Integer> interestedNBMap = new HashMap<>();
+        Map<String, Integer> downloadMap = peer.getDownloadRateMap();
+        Map<String, Integer> interestedNBMap = new HashMap<>();
         Set<String> interestedList = peer.getInterestedList();
         Set<String> unchokedList = new HashSet<>();
         Set<String> chokedList = new HashSet<>();

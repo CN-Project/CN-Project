@@ -37,7 +37,7 @@ public class Peer {
     private Map<String, Client> clientThreadMap = new HashMap<>();
 
     /** Store the download rate for every peer, used to decided preferred neighbor. */
-    private HashMap<String, Integer> downloadRateMap = new HashMap<>();
+    private Map<String, Integer> downloadRateMap = new HashMap<>();
 
     /** Every peer will keep the unchoked list for preferred neighbor. */
     private Set<String> unchokedList = new HashSet<>();
@@ -49,10 +49,10 @@ public class Peer {
     private Set<String> interestedList = new HashSet<>();
 
     /** all peers provided by the cfg file*/
-    private HashMap<String, Peer> peerList = new HashMap<>();
+    private Map<String, Peer> peerList = new HashMap<>();
 
     /** all peers connecting to the current peer*/
-    private HashSet<String> connectedList = new HashSet<>();
+    private Set<String> connectedList = new HashSet<>();
 
     // Empty constructor
     public Peer(){}
@@ -145,7 +145,7 @@ public class Peer {
         this.chokedList = chokedList;
     }
 
-    public void setPeerList(HashMap<String, Peer> peerList)
+    public void setPeerList(Map<String, Peer> peerList)
     {
         for (Map.Entry<String, Peer> entry : peerList.entrySet()) {
             String peerID = entry.getKey();
@@ -209,9 +209,9 @@ public class Peer {
         return this.clientThreadMap;
     }
 
-    public HashMap<String, Peer> getPeerList() { return this.peerList; }
+    public Map<String, Peer> getPeerList() { return this.peerList; }
 
-    public HashMap<String, Integer> getDownloadRateMap() {
+    public Map<String, Integer> getDownloadRateMap() {
         return downloadRateMap;
     }
 

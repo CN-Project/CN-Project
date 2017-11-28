@@ -17,7 +17,7 @@ public class Server extends Thread{
     private Peer serverPeer;
 
 //    private HashSet<String> connectedList = new HashSet<>();
-    private HashMap<String, Peer> peerList = new HashMap<>();
+    private Map<String, Peer> peerList = new HashMap<>();
 
     public Server(Peer serverPeer) {
         this.linsteningPort = serverPeer.getListeningPort();
@@ -90,31 +90,34 @@ public class Server extends Thread{
                                 // send HandShakeMsg back
                                 sentHandShakeMsg.setPeerID(this.serverPeerID);
                                 System.out.println("{Server} Send HandShake message from Server " + this.serverPeerID
-                                        + "to Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()) + "\n");
+                                        + " to Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()) + "\n");
                                 this.sendHandShakeMsg(sentHandShakeMsg);
                                 this.HandShakeReceiver = true;
                                 break;
 
                             case "Msg.BitFieldMsg":
                                 receivedActualMsg = (BitFieldMsg) readObject;
-                                    System.out.println("\n" + "{Server} Receive BitFieldMsg from Client " + this.clientPeerID
+                                System.out.println("\n" + "{Server} Receive BitFieldMsg from Client " + this.clientPeerID
                                             + " to Server " + this.serverPeerID);
                                 // create a client thread of current peer, to connect serverPeer
-                                this.serverPeer.updateConnetedList(this.clientPeerID);
-                                Client newClient = new Client(this.serverPeer, this.serverPeer.getPeerList().get(this.clientPeerID));
-                                this.serverPeer.addClientThreadMap(this.clientPeerID, newClient);
+                                if (!this.serverPeer.isInConnectedList(this.clientPeerID)) {
+                                    this.serverPeer.updateConnetedList(this.clientPeerID);
+                                    Client newClient = new Client(this.serverPeer, this.serverPeer.getPeerList().get(this.clientPeerID));
+                                    this.serverPeer.addClientThreadMap(this.clientPeerID, newClient);
+                                    newClient.start();
+                                }
 
                                 if(this.HandShakeReceiver){
                                     if(serverPeer.isHasPieces()){
                                         //if the server has some pieces
                                         //add the bitField of clientPeer into the bitFieldNeighbors
-                                    serverPeer.addBitFieldNeighbor(serverPeerID, receivedActualMsg.byteArray2booleanArray(receivedActualMsg.getMessagePayload()));
+                                        serverPeer.addBitFieldNeighbor(serverPeerID, receivedActualMsg.byteArray2booleanArray(receivedActualMsg.getMessagePayload()));
                                         sentActualMsg = new BitFieldMsg(serverPeer.getNumOfPiece());
-                                        sentActualMsg = new BitFieldMsg(serverPeer.getNumOfPiece());
+//                                        sentActualMsg = new BitFieldMsg(serverPeer.getNumOfPiece());
                                         sentActualMsg.setMessagePayload(sentActualMsg.booleanArray2byteArray(serverPeer.getBitFieldSelf()));
-                                        for(byte b : sentActualMsg.getMessagePayload()){
-                                            System.out.println(b);
-                                        }
+//                                        for(byte b : sentActualMsg.getMessagePayload()){
+//                                            System.out.println(b);
+//                                        }
                                         serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
                                         System.out.println("{Server} Send BitFieldMsg from Client " + this.serverPeerID
                                             + " back to Server " + this.clientPeerID + "\n");
