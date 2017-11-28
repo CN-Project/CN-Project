@@ -208,6 +208,8 @@ public class Server extends Thread{
                                     System.out.println("{Client} Send HaveMsg from Client " + this.serverPeerID
                                             + " to Server " + destinationPeerID + "\n");
                                 }
+                                // 3. update download rate map
+                                this.serverPeer.addDownloadRateMap(this.clientPeerID);
                                 break;
 
                             case "Msg.ChokeMsg":

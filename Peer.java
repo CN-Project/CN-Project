@@ -194,6 +194,15 @@ public class Peer {
         return downloadRateMap;
     }
 
+    public void addDownloadRateMap(String peerId){
+        if(downloadRateMap.containsKey(peerId)){
+            downloadRateMap.put(peerId, downloadRateMap.get(peerId)+1);
+        }
+        else{
+            downloadRateMap.put(peerId, new Integer(1));
+        }
+    }
+
     public Set<String> getUnchokedList() {
         return unchokedList;
     }
