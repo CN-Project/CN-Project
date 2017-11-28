@@ -67,7 +67,7 @@ public class Client extends Thread{
             //if received Msg is handshake
             if(readObject.getClass().getName() == "Msg.HandShakeMsg"){
                 receivedHandShakeMsg = (HandShakeMsg) readObject;
-                System.out.println("{Client} Receive handshake message " + receivedHandShakeMsg.getHandShakeHeader() + "from Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()));
+                System.out.println("{Client} Receive handshake message " + receivedHandShakeMsg.getHandShakeHeader() + "from Server " + Integer.parseInt(receivedHandShakeMsg.getPeerID()));
 
                 if(receivedHandShakeMsg.getPeerID().equals(this.serverPeerID)){
                     System.out.println("{Client} HandShake success!" + "\n");
@@ -84,8 +84,8 @@ public class Client extends Thread{
             System.out.println("\n" + "{Client} set the bitfield of BitfieldMsg.");
             sentActualMsg.setMessagePayload(sentActualMsg.booleanArray2byteArray(clientPeer.getBitFieldSelf()));
             sendActualMsg(sentActualMsg);
-            System.out.println("{Client} sent bitfieldMsg from Client " + this.clientPeerID
-                    + "to Server " + this.serverPeerID + "\n");
+            System.out.println("{Client} send bitfieldMsg from Client " + this.clientPeerID
+                    + " to Server " + this.serverPeerID + "\n");
 
             // enter while loop and wait various kinds of Msg from neighbors
             while(true){

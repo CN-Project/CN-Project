@@ -118,9 +118,9 @@ public class Server extends Thread{
 //                                        for(byte b : sentActualMsg.getMessagePayload()){
 //                                            System.out.println(b);
 //                                        }
-                                        serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
-                                        System.out.println("{Server} Send BitFieldMsg from Client " + this.serverPeerID
-                                            + " back to Server " + this.clientPeerID + "\n");
+//                                        serverPeer.getClientThreadMap().get(this.clientPeerID).sendActualMsg(sentActualMsg);
+//                                        System.out.println("{Server} Send BitFieldMsg from Client " + this.serverPeerID
+//                                            + " back to Server " + this.clientPeerID + "\n");
                                     }
                                 }else {
                                     // receive BitField Msg for the second time, so send InterestedMsg or NotInterestedMsg

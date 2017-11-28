@@ -27,9 +27,9 @@ public class PeerProcess {
     public static void main(String[] args) {
 
         PeerProcess process = new PeerProcess();
-//        CfgGenerator cfgGenerator = new CfgGenerator();
-//        cfgGenerator.run();
-//        System.out.println("Successfully generate configuration files......" + "\n");
+        CfgGenerator cfgGenerator = new CfgGenerator();
+        cfgGenerator.run();
+        System.out.println("Successfully generate configuration files......" + "\n");
 
 
         /** Get common configuration info and store in a map*/
@@ -53,7 +53,7 @@ public class PeerProcess {
         // Setup this peer as a server
         process.createServer();
         // Create peer subdirectory, if this peer is the first peer, split file into pieces.
-//        process.fileHandling();
+        process.fileHandling();
 
         // Run preferred & optimistic neighbors update
         PreferredNBUpdate preferredNB = new PreferredNBUpdate(process.inputPeer, 3, 6);
@@ -136,8 +136,10 @@ public class PeerProcess {
             String serverPeerID = entry.getKey();
             Peer serverPeer = entry.getValue();
             if (Integer.parseInt(serverPeerID) < Integer.parseInt(peerID)) {
+                System.out.println("Set up new connection from " + peerID + " to " + serverPeerID);
                 Client newConnection = new Client(this.inputPeer, serverPeer);
                 this.inputPeer.addClientThreadMap(serverPeerID, newConnection);
+                this.inputPeer.updateConnetedList(serverPeerID);
                 newConnection.start();
             }
         }
