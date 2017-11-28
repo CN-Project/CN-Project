@@ -205,7 +205,7 @@ public class PeerProcess {
      * @return byte array
      * @throws IOException
      */
-    public static byte[] readFile2ByteArray(String filename)throws IOException{
+    public byte[] readFile2ByteArray(String filename)throws IOException{
 
         FileChannel fc = null;
         try{
@@ -236,7 +236,7 @@ public class PeerProcess {
      * @param outputFile
      * @return
      */
-    public static File storeByteArray2File(byte[] bytes, String outputFile) {
+    public File storeByteArray2File(byte[] bytes, String outputFile) {
         File ret = null;
         BufferedOutputStream stream = null;
         try {

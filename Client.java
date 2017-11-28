@@ -70,7 +70,12 @@ public class Client extends Thread{
                 System.out.println("{Client} Receive handshake message " + receivedHandShakeMsg.getHandShakeHeader() + "from Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()));
 
                 if(receivedHandShakeMsg.getPeerID() == this.serverPeerID){
-                    System.out.println("{Client} HandShake succeed!" + "\n");
+                    System.out.println("{Client} HandShake success!" + "\n");
+                }else {
+                    System.out.println("{Client} HandShake FAIL!");
+                    System.out.println("{Client} clientPeerID" + receivedHandShakeMsg.getPeerID());
+                    System.out.println("{Client} serverID" + this.serverPeerID);
+
                 }
             }
 
@@ -84,27 +89,7 @@ public class Client extends Thread{
 
             // enter while loop and wait various kinds of Msg from neighbors
             while(true){
-//                //read socket in
-//                readObject = in.readObject();
-//                System.out.println("{Client} Receive: " + readObject.getClass().getName());
-//                MsgType = readObject.getClass().getName();
-//
-//                switch (MsgType){
-//
-//                    case "Msg.HandShakeMsg":
-//                        receivedHandShakeMsg = (HandShakeMsg) readObject;
-//                        System.out.println("\n" + "{Client} Receive HandShake message " + receivedHandShakeMsg.getHandShakeHeader()
-//                                + "from Server " + Integer.parseInt(receivedHandShakeMsg.getPeerID()));
-//                        this.clientPeerID = receivedHandShakeMsg.getPeerID();
-//
-//                        // send HandShakeMsg back
-//                        sentHandShakeMsg.setPeerID(this.serverPeerID);
-//                        System.out.println("{Server} Send HandShake message from Server " + this.serverPeerID
-//                                + "to Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()) + "\n");
-//                        this.sendHandShakeMsg(sentHandShakeMsg);
-//                        break;
-//
-//                }
+                
             }
 
 
