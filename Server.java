@@ -16,9 +16,13 @@ public class Server extends Thread{
     private String linsteningPort;
     private Peer serverPeer;
 
+//    private HashSet<String> connectedList = new HashSet<>();
+    private HashMap<String, Peer> peerList = new HashMap<>();
+
     public Server(Peer serverPeer) {
         this.linsteningPort = serverPeer.getListeningPort();
         this.serverPeer = serverPeer;
+        this.peerList = serverPeer.getPeerList();
     }
     public void run()
     {
@@ -55,6 +59,7 @@ public class Server extends Thread{
         private byte[] indexOfPiece;
         private boolean isChoked = true;
         private boolean HandShakeReceiver = false;
+
 
         public Handler(Socket socket, Peer serverPeer){
             this.socket = socket;
@@ -94,6 +99,10 @@ public class Server extends Thread{
                                 receivedActualMsg = (BitFieldMsg) readObject;
                                     System.out.println("\n" + "{Server} Receive BitFieldMsg from Client " + this.clientPeerID
                                             + " to Server " + this.serverPeerID);
+                                // create a client thread of current peer, to connect serverPeer
+                                this.serverPeer.updateConnetedList(this.clientPeerID);
+                                Client newClient = new Client(this.serverPeer, this.serverPeer.getPeerList().get(this.clientPeerID));
+                                this.serverPeer.addClientThreadMap(this.clientPeerID, newClient);
 
                                 if(this.HandShakeReceiver){
                                     if(serverPeer.isHasPieces()){
@@ -101,7 +110,11 @@ public class Server extends Thread{
                                         //add the bitField of clientPeer into the bitFieldNeighbors
                                     serverPeer.addBitFieldNeighbor(serverPeerID, receivedActualMsg.byteArray2booleanArray(receivedActualMsg.getMessagePayload()));
                                         sentActualMsg = new BitFieldMsg(serverPeer.getNumOfPiece());
+                                        sentActualMsg = new BitFieldMsg(serverPeer.getNumOfPiece());
                                         sentActualMsg.setMessagePayload(sentActualMsg.booleanArray2byteArray(serverPeer.getBitFieldSelf()));
+                                        for(byte b : sentActualMsg.getMessagePayload()){
+                                            System.out.println(b);
+                                        }
                                         serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
                                         System.out.println("{Server} Send BitFieldMsg from Client " + this.serverPeerID
                                             + " back to Server " + this.clientPeerID + "\n");

@@ -48,6 +48,12 @@ public class Peer {
     /** A peer will keep its own bitfield info and neighbors' bitfield info, and its interested list */
     private Set<String> interestedList = new HashSet<>();
 
+    /** all peers provided by the cfg file*/
+    private HashMap<String, Peer> peerList = new HashMap<>();
+
+    /** all peers connecting to the current peer*/
+    private HashSet<String> connectedList = new HashSet<>();
+
     // Empty constructor
     public Peer(){}
 
@@ -139,12 +145,25 @@ public class Peer {
         this.chokedList = chokedList;
     }
 
+    public void setPeerList(HashMap<String, Peer> peerList)
+    {
+        for (Map.Entry<String, Peer> entry : peerList.entrySet()) {
+            String peerID = entry.getKey();
+            Peer currentPeer = entry.getValue();
+            this.peerList.put(peerID, currentPeer);
+        }
+    }
+
     public void addUnchokedList(String peerId) {
         unchokedList.add(peerId);
     }
 
     public void removeFromUnchokedList(String id) {
         unchokedList.remove(id);
+    }
+
+    public void updateConnetedList(String peerId){
+        this.connectedList.add(peerId);
     }
 
     /**
@@ -190,6 +209,8 @@ public class Peer {
         return this.clientThreadMap;
     }
 
+    public HashMap<String, Peer> getPeerList() { return this.peerList; }
+
     public HashMap<String, Integer> getDownloadRateMap() {
         return downloadRateMap;
     }
@@ -209,6 +230,10 @@ public class Peer {
 
     public Set<String> getChokedList() {
         return chokedList;
+    }
+
+    public boolean isInConnectedList(String peerId){
+        return this.connectedList.contains(peerId);
     }
 
     public boolean isHasPieces(){

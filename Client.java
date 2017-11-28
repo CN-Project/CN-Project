@@ -69,7 +69,7 @@ public class Client extends Thread{
                 receivedHandShakeMsg = (HandShakeMsg) readObject;
                 System.out.println("{Client} Receive handshake message " + receivedHandShakeMsg.getHandShakeHeader() + "from Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()));
 
-                if(receivedHandShakeMsg.getPeerID() == this.serverPeerID){
+                if(receivedHandShakeMsg.getPeerID().equals(this.serverPeerID)){
                     System.out.println("{Client} HandShake success!" + "\n");
                 }else {
                     System.out.println("{Client} HandShake FAIL!");
@@ -89,7 +89,7 @@ public class Client extends Thread{
 
             // enter while loop and wait various kinds of Msg from neighbors
             while(true){
-                
+
             }
 
 
@@ -163,6 +163,7 @@ public class Client extends Thread{
     public void sendActualMsg(ActualMsg actualMsg){
         try {
             out.writeObject(actualMsg);
+            System.out.println(actualMsg);
             out.flush();
         }
         catch (IOException ioException){
