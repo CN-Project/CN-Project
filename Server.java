@@ -235,12 +235,6 @@ public class Server extends Thread{
                                 }
                                 break;
                         }
-//                        //receive the message sent from the socket
-//                        message = (String) in.readObject();
-//                        System.out.println("Received message: " + message);
-//                        MESSAGE = message.toUpperCase();
-//                        sendMsg(MESSAGE);
-
                     }
                 }
                 catch(ClassNotFoundException classnot){

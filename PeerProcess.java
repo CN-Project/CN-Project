@@ -4,6 +4,9 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.RandomAccess;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileChannel.MapMode;
 
 /**
  * Created by jiantaozhang on 2017/10/22.
@@ -196,6 +199,67 @@ public class PeerProcess {
         }
     }
 
+    /***
+     * read a file and convert it to a byte array
+     * @param filename
+     * @return byte array
+     * @throws IOException
+     */
+    public static byte[] readFile2ByteArray(String filename)throws IOException{
+
+        FileChannel fc = null;
+        try{
+            fc = new RandomAccessFile(filename,"r").getChannel();
+            MappedByteBuffer byteBuffer = fc.map(MapMode.READ_ONLY, 0, fc.size()).load();
+//            System.out.println(byteBuffer.isLoaded());
+            byte[] result = new byte[(int)fc.size()];
+            if (byteBuffer.remaining() > 0) {
+//              System.out.println("remain");
+                byteBuffer.get(result, 0, byteBuffer.remaining());
+            }
+            return result;
+        }catch (IOException e) {
+            e.printStackTrace();
+            throw e;
+        }finally{
+            try{
+                fc.close();
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /***
+     * read a byte array and store the content into file
+     * @param bytes
+     * @param outputFile
+     * @return
+     */
+    public static File storeByteArray2File(byte[] bytes, String outputFile) {
+        File ret = null;
+        BufferedOutputStream stream = null;
+        try {
+            ret = new File(outputFile);
+            FileOutputStream fstream = new FileOutputStream(ret);
+            stream = new BufferedOutputStream(fstream);
+            stream.write(bytes);
+//            stream.close();
+        } catch (Exception e) {
+            // log.error("helper:get file from byte process error!");
+            e.printStackTrace();
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    // log.error("helper:get file from byte process error!");
+                    e.printStackTrace();
+                }
+            }
+        }
+        return ret;
+    }
 
     /**
      * Function used to merge files, when this peer has received all pieces, use mergeFile to merge into the complete one.
@@ -233,5 +297,4 @@ public class PeerProcess {
             ioe.printStackTrace();
         }
     }
-
 }
