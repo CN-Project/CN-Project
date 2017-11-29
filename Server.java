@@ -62,6 +62,7 @@ public class Server extends Thread{
         private boolean HandShakeReceiver = false;
 
 
+
         public Handler(Socket socket, Peer serverPeer){
             this.socket = socket;
             this.serverPeer = serverPeer;
@@ -117,27 +118,6 @@ public class Server extends Thread{
                                     }
                                 }
 
-//                                if(this.HandShakeReceiver){
-//                                    if(serverPeer.isHasPieces()){
-                                        //if the server has some pieces
-                                        //add the bitField of clientPeer into the bitFieldNeighbors
-//                                        serverPeer.addBitFieldNeighbor(serverPeerID, receivedActualMsg.byteArray2booleanArray(receivedActualMsg.getMessagePayload()));
-//                                        sentActualMsg = new BitFieldMsg(serverPeer.getNumOfPiece());
-//                                        sentActualMsg = new BitFieldMsg(serverPeer.getNumOfPiece());
-//                                        sentActualMsg.setMessagePayload(sentActualMsg.booleanArray2byteArray(serverPeer.getBitFieldSelf()));
-//                                        for(byte b : sentActualMsg.getMessagePayload()){
-//                                            System.out.println(b);
-//                                        }
-//                                        serverPeer.getClientThreadMap().get(this.clientPeerID).sendActualMsg(sentActualMsg);
-//                                        System.out.println("{Server} Send BitFieldMsg from Client " + this.serverPeerID
-//                                            + " back to Server " + this.clientPeerID + "\n");
-//                                    }
-//                                }else {
-                                    // receive BitField Msg for the second time, so send InterestedMsg or NotInterestedMsg
-
-                                    //add the bitField of clientPeer into the bitFieldNeighbors
-//                                    serverPeer.addBitFieldNeighbor(serverPeerID, receivedActualMsg.byteArray2booleanArray(receivedActualMsg.getMessagePayload()));
-                                    // send InterestedMsg or NotInterestedMsg
                                 if(serverPeer.isInterested(this.clientPeerID)){
                                     sentActualMsg = new InterestedMsg();
                                     serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
@@ -198,6 +178,9 @@ public class Server extends Thread{
                                     sentActualMsg = new PieceMsg();
                                     // to be done, set pieceMsg bitField, --------------------------
                                     int index = this.serverPeer.byteArray2int(indexOfPiece);
+                                    if(this.serverPeer.getReceivedPieceCount() > 305){
+
+                                    }
                                     byte[] content = this.serverPeer.readFile2ByteArray("peer_" + this.serverPeerID + "/" + index + ".dat");
                                     byte[] payload = this.serverPeer.concatByteArray(indexOfPiece, content);
                                     sentActualMsg.setMessagePayload(payload);
@@ -218,6 +201,13 @@ public class Server extends Thread{
                                 //update the bitField of the clientPeer in the bitFieldSelf
                                 indexOfPiece = receivedActualMsg.parseIndexFromPieceMsg();
                                 serverPeer.setBitFieldSelfOneBit(serverPeer.byteArray2int(indexOfPiece));
+                                String fileName = "peer_" + this.serverPeerID + "/" + serverPeer.byteArray2int(indexOfPiece) + ".dat";
+                                this.serverPeer.storeByteArray2File(Arrays.copyOfRange(receivedActualMsg.getMessagePayload(), 4, receivedActualMsg.getMessagePayload().length - 4), fileName);
+//                                this.serverPeer.addReceivedPieceCount();
+                                if(this.serverPeer.hasCompleteFileOrNot()){
+                                    this.serverPeer.setHasFileOrNot(true);
+                                    break;
+                                }
                                 // 1. check whether it is unchoked, if so, request another piece
                                 if(!this.isChoked){
                                     int index = this.serverPeer.getAPieceIndex(this.clientPeerID);

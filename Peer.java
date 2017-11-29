@@ -17,6 +17,8 @@ public class Peer {
     /** Four basic variables get from peerInfo */
     private String peerId;
 
+    private int receivedPieceCount = 0;
+
     private String hostName;
 
     private String listeningPort;
@@ -157,6 +159,10 @@ public class Peer {
         }
     }
 
+    public void addReceivedPieceCount(){
+        this.receivedPieceCount++;
+    }
+
     public void addUnchokedList(String peerId) {
         unchokedList.add(peerId);
     }
@@ -227,6 +233,10 @@ public class Peer {
         }
     }
 
+    public int getReceivedPieceCount(){
+        return this.receivedPieceCount;
+    }
+
     public Set<String> getUnchokedList() {
         return unchokedList;
     }
@@ -250,12 +260,20 @@ public class Peer {
     public boolean isInterested(String peerId){
         boolean[] bitFieldSelf = this.bitFieldSelf;
         boolean[] bitFieldNeighbor = this.bitFieldNeighbor.get(peerId);
-        for(int i = 0; i < bitFieldSelf.length; i++){
+        for(int i = 0; i < this.numOfPiece; i++){
             if(!bitFieldSelf[i] && bitFieldNeighbor[i]){
                 return true;
             }
         }
         return false;
+    }
+    public boolean hasCompleteFileOrNot(){
+        for(int i = 0; i < this.numOfPiece; i++){
+            if(!this.bitFieldSelf[i]){
+                return false;
+            }
+        }
+        return true;
     }
 
     /***
@@ -280,7 +298,7 @@ public class Peer {
     public int getAPieceIndex(String peerId){
         boolean[] bitFieldSelf = this.bitFieldSelf;
         boolean[] bitFieldNeighbor = this.bitFieldNeighbor.get(peerId);
-        for(int i = 0; i < bitFieldSelf.length; i++){
+        for(int i = 0; i < this.numOfPiece; i++){
             if(!bitFieldSelf[i] && bitFieldNeighbor[i]){
                 return i;
             }
