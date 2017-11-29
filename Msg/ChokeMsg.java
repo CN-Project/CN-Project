@@ -7,6 +7,5 @@ public class ChokeMsg extends ActualMsg{
 
     public ChokeMsg() {
         super((byte) 0);
-        setMessagePayload(null);
     }
 }

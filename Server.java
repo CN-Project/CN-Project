@@ -2,6 +2,7 @@
  * Created by xiyaoma on 10/19/17.
  */
 import Msg.*;
+import sun.jvm.hotspot.runtime.Bytes;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -196,6 +197,11 @@ public class Server extends Thread{
                                     // if serverPeer has the requested piece, send pieceMsg to the Client
                                     sentActualMsg = new PieceMsg();
                                     // to be done, set pieceMsg bitField, --------------------------
+                                    int index = this.serverPeer.byteArray2int(indexOfPiece);
+                                    byte[] content = this.serverPeer.readFile2ByteArray("peer_" + this.serverPeerID + "/" + index + ".dat");
+                                    byte[] payload = this.serverPeer.concatByteArray(indexOfPiece, content);
+                                    sentActualMsg.setMessagePayload(payload);
+
                                     // which includes 4-bytes index and corresponding piece of document.------------------
                                     serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
                                     System.out.println("{Server} Send PieceMsg from Client " + this.serverPeerID
@@ -316,5 +322,6 @@ public class Server extends Thread{
 //        }
 
     }
+
 
 }

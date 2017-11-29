@@ -20,14 +20,18 @@ public class BitFieldMsg extends ActualMsg {
      * @param bitFiled
      * @return
      */
-    public byte[] booleanArray2byteArray(boolean[] bitFiled) {
-        BitSet bitSet = new BitSet(bitFiled.length / Byte.SIZE);
-        for (int index = 0; index < bitFiled.length; index++) {
-            bitSet.set(index, bitFiled[index] == true);
-    }
+    public byte[] booleanArray2byteArray(boolean[] input) {
+        byte[] toReturn = new byte[input.length / 8];
+        for (int entry = 0; entry < toReturn.length; entry++) {
+            for (int bit = 0; bit < 8; bit++) {
+                if (input[entry * 8 + bit]) {
+                    toReturn[entry] |= (128 >> bit);
+                }
+            }
+        }
 
-    return bitSet.toByteArray();
-}
+        return toReturn;
+    }
 
     /***
      * convert byte array to boolean array
@@ -42,7 +46,7 @@ public class BitFieldMsg extends ActualMsg {
                 result[i+offset] = (b >> i & 0x1) != 0x0;
             }
             offset+=Byte.SIZE;
-            }
+        }
         return result;
     }
 }

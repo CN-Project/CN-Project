@@ -1,5 +1,8 @@
 import Msg.*;
 
+import java.io.*;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.time.Period;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -283,5 +286,73 @@ public class Peer {
             }
         }
         return -1;
+    }
+    /***
+     * read a file and convert it to a byte array
+     * @param filename
+     * @return byte array
+     * @throws IOException
+     */
+    public byte[] readFile2ByteArray(String filename)throws IOException{
+
+        FileChannel fc = null;
+        try{
+            fc = new RandomAccessFile(filename,"r").getChannel();
+            MappedByteBuffer byteBuffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size()).load();
+//            System.out.println(byteBuffer.isLoaded());
+            byte[] result = new byte[(int)fc.size()];
+            if (byteBuffer.remaining() > 0) {
+//              System.out.println("remain");
+                byteBuffer.get(result, 0, byteBuffer.remaining());
+            }
+            return result;
+        }catch (IOException e) {
+            e.printStackTrace();
+            throw e;
+        }finally{
+            try{
+                fc.close();
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /***
+     * read a byte array and store the content into file
+     * @param bytes
+     * @param outputFile
+     * @return
+     */
+    public File storeByteArray2File(byte[] bytes, String outputFile) {
+        File ret = null;
+        BufferedOutputStream stream = null;
+        try {
+            ret = new File(outputFile);
+            FileOutputStream fstream = new FileOutputStream(ret);
+            stream = new BufferedOutputStream(fstream);
+            stream.write(bytes);
+//            stream.close();
+        } catch (Exception e) {
+            // log.error("helper:get file from byte process error!");
+            e.printStackTrace();
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    // log.error("helper:get file from byte process error!");
+                    e.printStackTrace();
+                }
+            }
+        }
+        return ret;
+    }
+    public byte[] concatByteArray(byte[] a, byte[] b){
+
+        byte[] c = new byte[a.length + b.length];
+        System.arraycopy(a, 0, c, 0, a.length);
+        System.arraycopy(b, 0, c, a.length, b.length);
+        return c;
     }
 }

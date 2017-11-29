@@ -7,6 +7,5 @@ public class UnChokeMsg extends ActualMsg{
 
     public UnChokeMsg() {
         super((byte) 1);
-        setMessagePayload(null);
     }
 }

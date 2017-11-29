@@ -90,7 +90,7 @@ public class ActualMsg implements Serializable{
      * @return
      */
     public byte[] parseIndexFromPieceMsg(){ // Xiyao Ma
-        if(this.getMessageType() == "Have" || this.getMessageType() == "Request" || this.getMessageType() == "Piece"){
+        if(this.getMessageType().equals("Have") || this.getMessageType().equals("Request") || this.getMessageType().equals("Piece")){
             return Arrays.copyOfRange(this.messagePayload, 0, 4);
         }
         System.out.println("Wrong Msg Type, don't has index filed. Msg must be one of following Msgs: HaveMsg, RequestMsg, PieceMsg. ");

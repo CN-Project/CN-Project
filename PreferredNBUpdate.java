@@ -72,6 +72,8 @@ public class PreferredNBUpdate implements Runnable {
         for(String unchokePeer:unchokedList){
             if(!currentUnchokedList.contains(unchokePeer)){
                 neighborClients.get(unchokePeer).sendActualMsg(new UnChokeMsg());
+                System.out.println("{Server} Send unChoke from Client " + this.peer.getPeerId()
+                        + " to Server " + unchokePeer + "\n");
             }
         }
 
@@ -79,6 +81,8 @@ public class PreferredNBUpdate implements Runnable {
         for(String chokePeer:chokedList){
             if(!currentChokedList.contains(chokePeer)){
                 neighborClients.get(chokePeer).sendActualMsg(new ChokeMsg());
+                System.out.println("{Server} Send choke from Client " + this.peer.getPeerId()
+                        + " to Server " + chokePeer + "\n");
             }
         }
 
