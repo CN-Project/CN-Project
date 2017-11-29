@@ -99,47 +99,56 @@ public class Server extends Thread{
                                 receivedActualMsg = (BitFieldMsg) readObject;
                                 System.out.println("\n" + "{Server} Receive BitFieldMsg from Client " + this.clientPeerID
                                             + " to Server " + this.serverPeerID);
+                                //add the bitField of clientPeer into the bitFieldNeighbors
+                                serverPeer.addBitFieldNeighbor(this.clientPeerID, receivedActualMsg.byteArray2booleanArray(receivedActualMsg.getMessagePayload()));
                                 // create a client thread of current peer, to connect serverPeer
                                 if (!this.serverPeer.isInConnectedList(this.clientPeerID)) {
                                     this.serverPeer.updateConnetedList(this.clientPeerID);
                                     Client newClient = new Client(this.serverPeer, this.serverPeer.getPeerList().get(this.clientPeerID));
                                     this.serverPeer.addClientThreadMap(this.clientPeerID, newClient);
                                     newClient.start();
+                                    while (!newClient.isCompleted) {
+                                        try {
+                                            sleep(10);
+                                        } catch (InterruptedException ire) {
+                                            ire.printStackTrace();
+                                        }
+                                    }
                                 }
 
-                                if(this.HandShakeReceiver){
-                                    if(serverPeer.isHasPieces()){
+//                                if(this.HandShakeReceiver){
+//                                    if(serverPeer.isHasPieces()){
                                         //if the server has some pieces
                                         //add the bitField of clientPeer into the bitFieldNeighbors
-                                        serverPeer.addBitFieldNeighbor(serverPeerID, receivedActualMsg.byteArray2booleanArray(receivedActualMsg.getMessagePayload()));
-                                        sentActualMsg = new BitFieldMsg(serverPeer.getNumOfPiece());
+//                                        serverPeer.addBitFieldNeighbor(serverPeerID, receivedActualMsg.byteArray2booleanArray(receivedActualMsg.getMessagePayload()));
 //                                        sentActualMsg = new BitFieldMsg(serverPeer.getNumOfPiece());
-                                        sentActualMsg.setMessagePayload(sentActualMsg.booleanArray2byteArray(serverPeer.getBitFieldSelf()));
+//                                        sentActualMsg = new BitFieldMsg(serverPeer.getNumOfPiece());
+//                                        sentActualMsg.setMessagePayload(sentActualMsg.booleanArray2byteArray(serverPeer.getBitFieldSelf()));
 //                                        for(byte b : sentActualMsg.getMessagePayload()){
 //                                            System.out.println(b);
 //                                        }
 //                                        serverPeer.getClientThreadMap().get(this.clientPeerID).sendActualMsg(sentActualMsg);
 //                                        System.out.println("{Server} Send BitFieldMsg from Client " + this.serverPeerID
 //                                            + " back to Server " + this.clientPeerID + "\n");
-                                    }
-                                }else {
+//                                    }
+//                                }else {
                                     // receive BitField Msg for the second time, so send InterestedMsg or NotInterestedMsg
 
                                     //add the bitField of clientPeer into the bitFieldNeighbors
-                                    serverPeer.addBitFieldNeighbor(serverPeerID, receivedActualMsg.byteArray2booleanArray(receivedActualMsg.getMessagePayload()));
+//                                    serverPeer.addBitFieldNeighbor(serverPeerID, receivedActualMsg.byteArray2booleanArray(receivedActualMsg.getMessagePayload()));
                                     // send InterestedMsg or NotInterestedMsg
-                                    if(serverPeer.isInterested(serverPeerID)){
-                                        sentActualMsg = new InterestedMsg();
-                                        serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
-                                        System.out.println("{Server} Send InterestedMsg from Client " + this.serverPeerID
-                                            + " back to Server " + this.clientPeerID + "\n");
-                                    }else {
-                                        sentActualMsg = new NotInterestedMsg();
-                                        serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
-                                        System.out.println("{Server} Send NotInterestedMsg from Client " + this.serverPeerID
-                                            + " back to Server " + this.clientPeerID + "\n");
-                                    }
+                                if(serverPeer.isInterested(this.clientPeerID)){
+                                    sentActualMsg = new InterestedMsg();
+                                    serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
+                                    System.out.println("{Server} Send InterestedMsg from Client " + this.serverPeerID
+                                        + " back to Server " + this.clientPeerID + "\n");
+                                }else {
+                                    sentActualMsg = new NotInterestedMsg();
+                                    serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
+                                    System.out.println("{Server} Send NotInterestedMsg from Client " + this.serverPeerID
+                                        + " back to Server " + this.clientPeerID + "\n");
                                 }
+//                                }
                                 break;
 
                             case "Msg.HaveMsg":

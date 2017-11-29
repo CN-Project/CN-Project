@@ -30,6 +30,7 @@ public class Client extends Thread{
     private ActualMsg sentActualMsg; //Actual Msg send to the server
     private ActualMsg receivedActualMsg; //Actual Msg received from the server
     private byte[] indexOfPiece;
+    public boolean isCompleted = false;
 
     public Client(Peer clientPeer, Peer serverPeer){
         this.clientPeer = clientPeer;
@@ -86,6 +87,7 @@ public class Client extends Thread{
             sendActualMsg(sentActualMsg);
             System.out.println("{Client} send bitfieldMsg from Client " + this.clientPeerID
                     + " to Server " + this.serverPeerID + "\n");
+            isCompleted = true;
 
             // enter while loop and wait various kinds of Msg from neighbors
             while(true){
