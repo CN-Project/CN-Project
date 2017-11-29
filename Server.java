@@ -2,7 +2,6 @@
  * Created by xiyaoma on 10/19/17.
  */
 import Msg.*;
-import sun.jvm.hotspot.runtime.Bytes;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -202,11 +201,12 @@ public class Server extends Thread{
                                 indexOfPiece = receivedActualMsg.parseIndexFromPieceMsg();
                                 serverPeer.setBitFieldSelfOneBit(serverPeer.byteArray2int(indexOfPiece));
                                 String fileName = "peer_" + this.serverPeerID + "/" + serverPeer.byteArray2int(indexOfPiece) + ".dat";
-                                this.serverPeer.storeByteArray2File(Arrays.copyOfRange(receivedActualMsg.getMessagePayload(), 4, receivedActualMsg.getMessagePayload().length - 4), fileName);
+                                this.serverPeer.storeByteArray2File(Arrays.copyOfRange(receivedActualMsg.getMessagePayload(), 4, receivedActualMsg.getMessagePayload().length), fileName);
 //                                this.serverPeer.addReceivedPieceCount();
                                 if(this.serverPeer.hasCompleteFileOrNot()){
                                     this.serverPeer.setHasFileOrNot(true);
-                                    break;
+                                    mergeFiles();
+                                    System.out.println("\nPeer " + this.serverPeer.getPeerId() + " has received all file pieces, successfully merge into a complete filed!!\n");
                                 }
                                 // 1. check whether it is unchoked, if so, request another piece
                                 if(!this.isChoked){
@@ -294,6 +294,41 @@ public class Server extends Thread{
                 ioException.printStackTrace();
             }
         }
+
+
+        /**
+         * Function used to merge files, when this peer has received all pieces, use mergeFile to merge into the complete one.
+         */
+        public void mergeFiles() {
+            if (this.serverPeer.getPeerId().equals("1001")) {
+                return;
+            }
+
+            File peerDirectoryFile = new File("peer_" + this.serverPeer.getPeerId());
+            String path = peerDirectoryFile.getAbsolutePath();
+            File targetFile = new File(path + "/TheFile.dat");
+
+
+            try {
+                RandomAccessFile target = new RandomAccessFile(targetFile, "rw");
+                for (int i = 0; i < serverPeer.getNumOfPiece(); i++) {
+                    File file = new File(path + "/" + i + ".dat");
+                    RandomAccessFile pieceFile = new RandomAccessFile(file, "r");
+                    byte[] bytes = new byte[1024];
+                    int len = -1;
+
+                    while ((len = pieceFile.read(bytes)) != -1) {
+                        target.write(bytes, 0, len);
+                    }
+                    pieceFile.close();
+                }
+                target.close();
+            } catch (FileNotFoundException fne) {
+                fne.printStackTrace();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
         /***
          * block sendActualMsg, since every time send ActualMsg, need we to send it through the client of this Peer!!!
          */
@@ -312,6 +347,8 @@ public class Server extends Thread{
 //        }
 
     }
+
+
 
 
 }
