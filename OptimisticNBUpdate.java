@@ -24,7 +24,7 @@ public class OptimisticNBUpdate implements Runnable {
             }
         }
     }
-    private void updateOptimisticNB(){
+    private synchronized void updateOptimisticNB(){
         Set<String> chokedList = this.peer.getChokedList();
         Set<String> interestList = this.peer.getInterestedList();
 

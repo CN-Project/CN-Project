@@ -90,9 +90,9 @@ public class Client extends Thread{
             isCompleted = true;
 
             // enter while loop and wait various kinds of Msg from neighbors
-            while(true){
-
-            }
+//            while(true){
+//
+//            }
 
 
         }
