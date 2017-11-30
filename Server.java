@@ -46,7 +46,7 @@ public class Server extends Thread{
         }
     }
 
-    private static class Handler extends Thread{
+    private class Handler extends Thread{
         private String MsgType;
         private Socket socket;
         private ObjectOutputStream out;
@@ -74,12 +74,37 @@ public class Server extends Thread{
         public synchronized void run(){
             try {
                 //initialize Input and Output streams
-                out = new ObjectOutputStream(socket.getOutputStream());
-                out.flush();
-                in = new ObjectInputStream(socket.getInputStream());
+                try{
+                    out = new ObjectOutputStream(socket.getOutputStream());
+                    out.flush();
+                    in = new ObjectInputStream(socket.getInputStream());
+                }catch(IOException ioe){
+                    try{
+                        this.socket = new ServerSocket(Integer.parseInt(this.serverPeer.getListeningPort())).accept();
+                        out = new ObjectOutputStream(socket.getOutputStream());
+                        out.flush();
+                        in = new ObjectInputStream(socket.getInputStream());
+                    }
+                    catch(Exception e){
+                        System.out.println("problem still");
+                    }
+                }
+
                 try {
                     while (true){
-                        Object readObject = in.readObject();
+                        Object readObject = null;
+                        try{
+                            readObject = in.readObject();
+                        }catch(IOException ioe){
+                            try{
+                                this.socket = new ServerSocket(Integer.parseInt(this.serverPeer.getListeningPort())).accept();
+                                in = new ObjectInputStream(socket.getInputStream());
+                            }
+                            catch(Exception e){
+                                System.out.println("problem still");
+                            }
+                        }
+
                         System.out.println("{Server} Receive: " + readObject.getClass().getName());
                         MsgType = readObject.getClass().getName();
                         SimpleDateFormat dateFormat = new SimpleDateFormat();
@@ -162,22 +187,23 @@ public class Server extends Thread{
                                 serverPeer.updateBitFieldNeighbor(this.clientPeerID, serverPeer.byteArray2int(indexOfPiece));
                                 // send InterestedMsg or NotInterestedMsg
                                 if(serverPeer.isInterested(this.clientPeerID)){
-                                    sentActualMsg = new InterestedMsg();
-                                    serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
-                                    //write log
-                                    logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " send InterestedMsg to Peer " + this.clientPeerID + ".";
-                                    this.serverPeer.writeLog(logContent);
-                                    System.out.println("{Server} Send InterestedMsg from Client " + this.serverPeerID
-                                        + " back to Server " + this.clientPeerID + "\n");
-                                }else {
-                                    sentActualMsg = new NotInterestedMsg();
-                                    serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
-                                    //write log
-                                    logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " send NotInterestedMsg to Peer " + this.clientPeerID + ".";
-                                    this.serverPeer.writeLog(logContent);
-                                    System.out.println("{Server} Send NotInterestedMsg from Client " + this.serverPeerID
-                                        + " back to Server " + this.clientPeerID + "\n");
-                                }
+                                        sentActualMsg = new InterestedMsg();
+                                        serverPeer.getClientThreadMap().get(clientPeerID)
+                                                .sendActualMsg(sentActualMsg);
+                                //write log
+                                        logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " send InterestedMsg to Peer " + this.clientPeerID + ".";
+                                        this.serverPeer.writeLog(logContent);
+                                        System.out.println("{Server} Send InterestedMsg from Client " + this.serverPeerID
+                                            + " back to Server " + this.clientPeerID + "\n");
+                                    }else {
+                                        sentActualMsg = new NotInterestedMsg();
+                                        Client tmpclient = serverPeer.getClientThreadMap().get(clientPeerID);
+                                        tmpclient.sendActualMsg(sentActualMsg);
+                                        logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " send NotInterestedMsg to Peer " + this.clientPeerID + ".";
+                                        this.serverPeer.writeLog(logContent);
+                                        System.out.println("{Server} Send NotInterestedMsg from Client " + this.serverPeerID
+                                            + " back to Server " + this.clientPeerID + "\n");
+                                    }
                                 break;
 
                             case "Msg.InterestedMsg":
@@ -280,6 +306,7 @@ public class Server extends Thread{
                                         client.sendActualMsg(sentActualMsg);
 
                                     }catch (Exception e){
+                                        System.out.println("captured here");
                                         System.out.println(e);
                                     }
                                     //write log

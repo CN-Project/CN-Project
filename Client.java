@@ -136,6 +136,10 @@ public class Client extends Thread{
      */
     public void sendMsg(String message){
         try {
+            if(!(requestSocket.isConnected() && !requestSocket.isClosed())){
+                requestSocket = new Socket(this.serverPeerAddr, Integer.parseInt(this.listeningPort));
+                out = new ObjectOutputStream(requestSocket.getOutputStream());
+            }
             out.writeObject(message);
             out.flush();
             System.out.println("{Client} Send message: " + message);
@@ -165,12 +169,24 @@ public class Client extends Thread{
      */
     public void sendActualMsg(ActualMsg actualMsg){
         try {
+//            if(requestSocket == null | !(requestSocket.isConnected() && !requestSocket.isClosed())){
+//                requestSocket = new Socket(this.serverPeerAddr, Integer.parseInt(this.listeningPort));
+//                out = new ObjectOutputStream(requestSocket.getOutputStream());
+//            }
             out.writeObject(actualMsg);
             System.out.println(actualMsg);
             out.flush();
         }
         catch (IOException ioException){
-            ioException.printStackTrace();
+            try{
+                requestSocket = new Socket(this.serverPeerAddr, Integer.parseInt(this.listeningPort));
+                out = new ObjectOutputStream(requestSocket.getOutputStream());
+                System.out.println(actualMsg);
+                out.flush();
+            }
+            catch(Exception e){
+                System.out.println("problem still");
+            }
         }
     }
 }
