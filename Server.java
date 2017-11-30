@@ -165,7 +165,8 @@ public class Server extends Thread{
                                 receivedActualMsg = (NotInterestedMsg) readObject;
                                 System.out.println("\n" + "{Server} Receive NotInterestedMsg from Client " + this.clientPeerID
                                         + " to Server " + this.serverPeerID);
-                                System.out.println("{Server} No action required. " + "\n");
+//                                System.out.println("{Server} No action required. " + "\n");
+                                serverPeer.removeFromInterestedList(this.clientPeerID);
                                 break;
 
                             case "Msg.RequestMsg":

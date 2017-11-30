@@ -115,6 +115,10 @@ public class Peer {
         this.interestedList.add(peerID);
     }
 
+    public void removeFromInterestedList(String peerID){
+        this.interestedList.remove(peerID);
+    }
+
     public void setFileStore(byte[] content, int index) {
         this.fileStore[index] = content;
     }
