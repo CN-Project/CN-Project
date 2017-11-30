@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.nio.*;
 import java.nio.channels.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Handler;
@@ -81,6 +82,9 @@ public class Server extends Thread{
                         Object readObject = in.readObject();
                         System.out.println("{Server} Receive: " + readObject.getClass().getName());
                         MsgType = readObject.getClass().getName();
+                        SimpleDateFormat dateFormat = new SimpleDateFormat();
+                        String time = dateFormat.format(new Date());
+                        String logContent;
                         switch (MsgType) {
 
                             case "Msg.HandShakeMsg":
@@ -90,6 +94,9 @@ public class Server extends Thread{
                                         + "from Client " + Integer.parseInt(receivedHandShakeMsg.getPeerID()));
                                 this.clientPeerID = receivedHandShakeMsg.getPeerID();
 
+                                //write log
+                                logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " is connected from Peer " + this.clientPeerID + ".";
+                                this.serverPeer.writeLog(logContent);
                                 // send HandShakeMsg back
                                 sentHandShakeMsg.setPeerID(this.serverPeerID);
                                 System.out.println("{Server} Send HandShake message from Server " + this.serverPeerID
@@ -110,6 +117,10 @@ public class Server extends Thread{
                                     Client newClient = new Client(this.serverPeer, this.serverPeer.getPeerList().get(this.clientPeerID));
                                     this.serverPeer.addClientThreadMap(this.clientPeerID, newClient);
                                     newClient.start();
+                                    //write log
+                                    logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " make a connection to Peer " + this.clientPeerID + ".";
+                                    this.serverPeer.writeLog(logContent);
+
                                     while (!newClient.isCompleted) {
                                         try {
                                             sleep(10);
@@ -122,40 +133,58 @@ public class Server extends Thread{
                                 if(serverPeer.isInterested(this.clientPeerID)){
                                     sentActualMsg = new InterestedMsg();
                                     serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
+                                    //write log
+                                    logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " send InterestedMsg to Peer " + this.clientPeerID + ".";
+                                    this.serverPeer.writeLog(logContent);
                                     System.out.println("{Server} Send InterestedMsg from Client " + this.serverPeerID
                                         + " back to Server " + this.clientPeerID + "\n");
                                 }else {
                                     sentActualMsg = new NotInterestedMsg();
                                     serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
+                                    //write log
+                                    logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " send NotInterestedMsg to Peer " + this.clientPeerID + ".";
+                                    this.serverPeer.writeLog(logContent);
                                     System.out.println("{Server} Send NotInterestedMsg from Client " + this.serverPeerID
                                         + " back to Server " + this.clientPeerID + "\n");
                                 }
-//                                }
                                 break;
 
                             case "Msg.HaveMsg":
                                 receivedActualMsg = (HaveMsg) readObject;
                                 System.out.println("\n" + "{Server} Receive HaveMsg from Client " + this.clientPeerID
                                         + " to Server " + this.serverPeerID);
+                                //write log
+                                logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " received HaveMsg from Peer " + this.clientPeerID + ".";
+                                this.serverPeer.writeLog(logContent);
+
                                 indexOfPiece = receivedActualMsg.parseIndexFromPieceMsg();
                                 // update the bitFieldNeighbor
                                 serverPeer.updateBitFieldNeighbor(this.clientPeerID, serverPeer.byteArray2int(indexOfPiece));
                                 // send InterestedMsg or NotInterestedMsg
                                 if(serverPeer.isInterested(this.clientPeerID)){
-                                        sentActualMsg = new InterestedMsg();
-                                        serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
-                                        System.out.println("{Server} Send InterestedMsg from Client " + this.serverPeerID
-                                            + " back to Server " + this.clientPeerID + "\n");
-                                    }else {
-                                        sentActualMsg = new NotInterestedMsg();
-                                        serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
-                                        System.out.println("{Server} Send NotInterestedMsg from Client " + this.serverPeerID
-                                            + " back to Server " + this.clientPeerID + "\n");
-                                    }
+                                    sentActualMsg = new InterestedMsg();
+                                    serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
+                                    //write log
+                                    logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " send InterestedMsg to Peer " + this.clientPeerID + ".";
+                                    this.serverPeer.writeLog(logContent);
+                                    System.out.println("{Server} Send InterestedMsg from Client " + this.serverPeerID
+                                        + " back to Server " + this.clientPeerID + "\n");
+                                }else {
+                                    sentActualMsg = new NotInterestedMsg();
+                                    serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
+                                    //write log
+                                    logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " send NotInterestedMsg to Peer " + this.clientPeerID + ".";
+                                    this.serverPeer.writeLog(logContent);
+                                    System.out.println("{Server} Send NotInterestedMsg from Client " + this.serverPeerID
+                                        + " back to Server " + this.clientPeerID + "\n");
+                                }
                                 break;
 
                             case "Msg.InterestedMsg":
                                 receivedActualMsg = (InterestedMsg) readObject;
+                                //write log
+                                logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " received InterestedMsg from Peer " + this.clientPeerID + ".";
+                                this.serverPeer.writeLog(logContent);
                                 System.out.println("\n" + "{Server} Receive InterestedMsg from Client " + this.clientPeerID
                                         + " to Server " + this.serverPeerID);
                                 // add ClientPeer into InterestedList
@@ -164,6 +193,9 @@ public class Server extends Thread{
 
                             case "Msg.NotInterestedMsg":
                                 receivedActualMsg = (NotInterestedMsg) readObject;
+                                //write log
+                                logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " received NotInterestedMsg from Peer " + this.clientPeerID + ".";
+                                this.serverPeer.writeLog(logContent);
                                 System.out.println("\n" + "{Server} Receive NotInterestedMsg from Client " + this.clientPeerID
                                         + " to Server " + this.serverPeerID);
 //                                System.out.println("{Server} No action required. " + "\n");
@@ -174,6 +206,10 @@ public class Server extends Thread{
                                 receivedActualMsg = (RequestMsg) readObject;
                                 System.out.println("\n" + "{Server} Receive RequestedMsg from Client " + this.clientPeerID
                                         + " to Server " + this.serverPeerID);
+                                //write log
+                                logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " received RequestedMsg from Peer " + this.clientPeerID + ".";
+                                this.serverPeer.writeLog(logContent);
+
                                 indexOfPiece = receivedActualMsg.parseIndexFromPieceMsg();
                                 if(serverPeer.getBitFieldSelf()[serverPeer.byteArray2int(indexOfPiece)]){
                                     // if serverPeer has the requested piece, send pieceMsg to the Client
@@ -189,6 +225,9 @@ public class Server extends Thread{
 
                                     // which includes 4-bytes index and corresponding piece of document.------------------
                                     serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
+                                    //write log
+                                    logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " send PieceMsg to Peer " + this.clientPeerID + ".";
+                                    this.serverPeer.writeLog(logContent);
                                     System.out.println("{Server} Send PieceMsg from Client " + this.serverPeerID
                                             + " back to Server " + this.clientPeerID + "\n");
 
@@ -198,6 +237,9 @@ public class Server extends Thread{
                             case "Msg.PieceMsg":
 
                                 receivedActualMsg = (PieceMsg) readObject;
+                                //write log
+                                logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " received PieceMsg from Peer " + this.clientPeerID + ".";
+                                this.serverPeer.writeLog(logContent);
                                 System.out.println("\n" + "{Server} Receive PieceMsg from Client " + this.clientPeerID + " to Client" + this.serverPeerID);
 
                                 //update the bitField of the clientPeer in the bitFieldSelf
@@ -209,6 +251,9 @@ public class Server extends Thread{
                                 if(this.serverPeer.hasCompleteFileOrNot()){
                                     this.serverPeer.setHasFileOrNot(true);
                                     mergeFiles();
+                                    //write log
+                                    logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " has downloaded the complete file.";
+                                    this.serverPeer.writeLog(logContent);
                                     System.out.println("\nPeer " + this.serverPeer.getPeerId() + " has received all file pieces, successfully merge into a complete filed!!\n");
                                 }
                                 // 1. check whether it is unchoked, if so, request another piece
@@ -269,11 +314,12 @@ public class Server extends Thread{
                     }
                 }
                 catch(ClassNotFoundException classnot){
-                    System.err.println("Data received in unknown format");
+                    System.err.println("[Server] Data received in unknown format");
                 }
             } catch (SocketException e) {
                 e.printStackTrace();
             } catch (IOException e) {
+                System.out.println("[Server] Disconnect with Client");
                 e.printStackTrace();
             }
         }

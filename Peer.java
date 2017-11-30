@@ -383,4 +383,21 @@ public class Peer {
         System.arraycopy(b, 0, c, a.length, b.length);
         return c;
     }
+    /***
+     * write to log file
+     * @param log
+     */
+    public void writeLog(String log)
+    {
+        try
+        {
+            FileWriter writer = new FileWriter("peer_" + this.getPeerId() + ".log",true);
+            writer.write("\n" + log);
+            writer.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
 }
