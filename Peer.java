@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by jiantaozhang on 2017/10/22.
@@ -36,13 +37,13 @@ public class Peer {
     private byte[][] fileStore;
 
     /** A map store all other peers' bitfield array. */
-    private Map<String, boolean[]> bitFieldNeighbor = new HashMap<>();
+    private Map<String, boolean[]> bitFieldNeighbor = new ConcurrentHashMap<>();
 
     /** Every peer will keep the server that it has already connected with as < serverPeerID, ClientConnectionThread > */
-    private Map<String, Client> clientThreadMap = new HashMap<>();
+    private Map<String, Client> clientThreadMap = new ConcurrentHashMap<>();
 
     /** Store the download rate for every peer, used to decided preferred neighbor. */
-    private Map<String, Integer> downloadRateMap = new HashMap<>();
+    private Map<String, Integer> downloadRateMap = new ConcurrentHashMap<>();
 
     /** Every peer will keep the unchoked list for preferred neighbor. */
     private Set<String> unchokedList = new HashSet<>();
@@ -54,7 +55,7 @@ public class Peer {
     private Set<String> interestedList = new HashSet<>();
 
     /** all peers provided by the cfg file*/
-    private Map<String, Peer> peerList = new HashMap<>();
+    private Map<String, Peer> peerList = new ConcurrentHashMap<>();
 
     /** all peers connecting to the current peer*/
     private Set<String> connectedList = new HashSet<>();

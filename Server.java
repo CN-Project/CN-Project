@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Handler;
 
 public class Server extends Thread{
@@ -17,7 +18,7 @@ public class Server extends Thread{
     private Peer serverPeer;
 
 //    private HashSet<String> connectedList = new HashSet<>();
-    private Map<String, Peer> peerList = new HashMap<>();
+    private Map<String, Peer> peerList = new ConcurrentHashMap<>();
 
     public Server(Peer serverPeer) {
         this.linsteningPort = serverPeer.getListeningPort();
@@ -139,7 +140,7 @@ public class Server extends Thread{
                                 // update the bitFieldNeighbor
                                 serverPeer.updateBitFieldNeighbor(this.clientPeerID, serverPeer.byteArray2int(indexOfPiece));
                                 // send InterestedMsg or NotInterestedMsg
-                                if(serverPeer.isInterested(serverPeerID)){
+                                if(serverPeer.isInterested(this.clientPeerID)){
                                         sentActualMsg = new InterestedMsg();
                                         serverPeer.getClientThreadMap().get(clientPeerID).sendActualMsg(sentActualMsg);
                                         System.out.println("{Server} Send InterestedMsg from Client " + this.serverPeerID

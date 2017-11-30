@@ -7,6 +7,7 @@ import java.util.RandomAccess;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by jiantaozhang on 2017/10/22.
@@ -27,9 +28,9 @@ public class PeerProcess {
     public static void main(String[] args) {
 
         PeerProcess process = new PeerProcess();
-        CfgGenerator cfgGenerator = new CfgGenerator();
-        cfgGenerator.run();
-        System.out.println("Successfully generate configuration files......" + "\n");
+//        CfgGenerator cfgGenerator = new CfgGenerator();
+//        cfgGenerator.run();
+//        System.out.println("Successfully generate configuration files......" + "\n");
 
 
         /** Get common configuration info and store in a map*/
@@ -97,7 +98,7 @@ public class PeerProcess {
      */
     public void getPeerCfg(String filename, int numOfPiece) {
 
-        peerList = new HashMap<>();
+        peerList = new ConcurrentHashMap<>();
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filename));

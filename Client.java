@@ -98,7 +98,7 @@ public class Client extends Thread{
         }
         catch (ConnectException e)
         {
-            System.err.println("Connection refused. You need to initiate a server first.");
+            System.err.println(e);
         }
         catch ( ClassNotFoundException e )
         {
@@ -111,17 +111,18 @@ public class Client extends Thread{
         catch(IOException ioException)
         {
             ioException.printStackTrace();
-        } finally {
-            //close TCP connection
-            try {
-                in.close();
-                out.close();
-                requestSocket.close();
-            }
-            catch (IOException ioException){
-                ioException.printStackTrace();
-            }
         }
+//        finally {
+//            //close TCP connection
+//            try {
+//                in.close();
+//                out.close();
+//                requestSocket.close();
+//            }
+//            catch (IOException ioException){
+//                ioException.printStackTrace();
+//            }
+//        }
     }
 
 //    public static void main(String args[]){
