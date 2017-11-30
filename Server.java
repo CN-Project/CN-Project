@@ -262,6 +262,9 @@ public class Server extends Thread{
                                     if(index != -1) {
                                         this.serverPeer.getClientThreadMap().get(this.clientPeerID).sendActualMsg(
                                                 new RequestMsg(ByteBuffer.allocate(4).putInt(index).array()));
+                                    //write log
+                                    logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " send RequestedMsg to Peer " + this.clientPeerID + ".";
+                                    this.serverPeer.writeLog(logContent);
                                     }
                                 }
 
@@ -275,10 +278,13 @@ public class Server extends Thread{
                                     String destinationPeerID = entry.getKey();
                                     try {
                                         client.sendActualMsg(sentActualMsg);
+
                                     }catch (Exception e){
                                         System.out.println(e);
                                     }
-
+                                    //write log
+                                    logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " send HaveMsg to Peer " + destinationPeerID + ".";
+                                    this.serverPeer.writeLog(logContent);
                                     System.out.println("{Client} Send HaveMsg from Client " + this.serverPeerID
                                             + " to Server " + destinationPeerID + "\n");
                                 }
@@ -288,6 +294,9 @@ public class Server extends Thread{
 
                             case "Msg.ChokeMsg":
                                 receivedActualMsg = (ChokeMsg) readObject;
+                                //write log
+                                logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " received ChokeMsg from Peer " + this.clientPeerID + ".";
+                                this.serverPeer.writeLog(logContent);
                                 System.out.println("{Server} Receive ChokeMsg from Client " + this.clientPeerID
                                         + " to Server " + this.serverPeerID);
                                 this.isChoked = true;
@@ -297,6 +306,9 @@ public class Server extends Thread{
                                 break;
                             case "Msg.UnChokeMsg":
                                 receivedActualMsg = (UnChokeMsg) readObject;
+                                //write log
+                                logContent = "[ " + time + " ]: Peer " + this.serverPeerID + " received UnChokeMsg from Peer " + this.clientPeerID + ".";
+                                this.serverPeer.writeLog(logContent);
                                 System.out.println("{Server} Receive UnChokeMsg from Client " + this.clientPeerID
                                         + " to Server " + this.serverPeerID);
                                 if(isChoked) {
