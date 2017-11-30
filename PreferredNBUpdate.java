@@ -63,30 +63,33 @@ public class PreferredNBUpdate implements Runnable {
         }
 
         Set<String> currentUnchokedList = peer.getUnchokedList();
-        for(String currentUnchoked:currentUnchokedList){
-            if(!unchokedList.contains(currentUnchoked)){
-                chokedList.add(currentUnchoked);
+        for (String currentUnchoked:currentUnchokedList){
+            if(unchokedList.contains(currentUnchoked)){
+                unchokedList.remove(currentUnchoked);
             }
+        }
+        Set<String> currentChokedList = peer.getChokedList();
+        for(String currentChoked:currentChokedList){
+            if(chokedList.contains(currentChoked)){
+                chokedList.remove(currentChoked);
+            }
+        }
+
+        for(String chokePeer:chokedList){
+            neighborClients.get(chokePeer).sendActualMsg(new ChokeMsg());
+            System.out.println("{Server} Send choke from Client " + this.peer.getPeerId()
+                    + " to Server " + chokePeer + "\n");
+            currentChokedList.add(chokePeer);
         }
 
         for(String unchokePeer:unchokedList){
-            if(!currentUnchokedList.contains(unchokePeer)){
-                neighborClients.get(unchokePeer).sendActualMsg(new UnChokeMsg());
-                System.out.println("{Server} Send unChoke from Client " + this.peer.getPeerId()
-                        + " to Server " + unchokePeer + "\n");
-            }
+            neighborClients.get(unchokePeer).sendActualMsg(new UnChokeMsg());
+            System.out.println("{Server} Send unChoke from Client " + this.peer.getPeerId()
+                    + " to Server " + unchokePeer + "\n");
+            currentUnchokedList.add(unchokePeer);
         }
 
-        Set<String> currentChokedList = peer.getChokedList();
-        for(String chokePeer:chokedList){
-            if(!currentChokedList.contains(chokePeer)){
-                neighborClients.get(chokePeer).sendActualMsg(new ChokeMsg());
-                System.out.println("{Server} Send choke from Client " + this.peer.getPeerId()
-                        + " to Server " + chokePeer + "\n");
-            }
-        }
-
-        peer.setChokedList(chokedList);
-        peer.setUnchokedList(unchokedList);
+        peer.setChokedList(currentChokedList);
+        peer.setUnchokedList(currentUnchokedList);
     }
 }
