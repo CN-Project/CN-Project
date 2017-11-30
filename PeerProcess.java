@@ -202,4 +202,22 @@ public class PeerProcess {
             peerDirectoryFile.mkdir();
         }
     }
+
+    /***
+     * write to log file
+     * @param filename
+     */
+    public void writeLog(String filename)
+    {
+        try
+        {
+            FileWriter writer = new FileWriter("peer_" + this.inputPeer.getPeerId() + ".log",true);
+            writer.write("\n" + filename);
+            writer.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

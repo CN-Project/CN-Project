@@ -25,7 +25,7 @@ public class Server extends Thread{
         this.serverPeer = serverPeer;
         this.peerList = serverPeer.getPeerList();
     }
-    public void run()
+    public synchronized void run()
     {
         try
         {
@@ -69,7 +69,7 @@ public class Server extends Thread{
             this.serverPeerID = serverPeer.getPeerId();
         }
 
-        public void run(){
+        public synchronized void run(){
             try {
                 //initialize Input and Output streams
                 out = new ObjectOutputStream(socket.getOutputStream());

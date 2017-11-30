@@ -47,7 +47,7 @@ public class Client extends Thread{
         }
     }
 
-    public void run(){
+    public synchronized void run(){
         try{
             //initialize Socket of client
             requestSocket = new Socket(serverPeerAddr, Integer.parseInt(this.listeningPort));
