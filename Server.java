@@ -6,6 +6,7 @@ import Msg.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
@@ -227,7 +228,12 @@ public class Server extends Thread{
                                 for(Map.Entry<String, Client> entry : serverPeer.getClientThreadMap().entrySet()){
                                     Client client = entry.getValue();
                                     String destinationPeerID = entry.getKey();
-                                    client.sendActualMsg(sentActualMsg);
+                                    try {
+                                        client.sendActualMsg(sentActualMsg);
+                                    }catch (Exception e){
+                                        System.out.println(e);
+                                    }
+
                                     System.out.println("{Client} Send HaveMsg from Client " + this.serverPeerID
                                             + " to Server " + destinationPeerID + "\n");
                                 }
@@ -265,6 +271,8 @@ public class Server extends Thread{
                 catch(ClassNotFoundException classnot){
                     System.err.println("Data received in unknown format");
                 }
+            } catch (SocketException e) {
+                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
