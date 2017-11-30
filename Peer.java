@@ -169,8 +169,16 @@ public class Peer {
         unchokedList.add(peerId);
     }
 
+    public void addchokedList(String peerId) {
+        chokedList.add(peerId);
+    }
+
     public void removeFromUnchokedList(String id) {
         unchokedList.remove(id);
+    }
+
+    public void removeFromchokedList(String id) {
+        chokedList.remove(id);
     }
 
     public void updateConnetedList(String peerId){

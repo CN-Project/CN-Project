@@ -60,8 +60,8 @@ public class PeerProcess {
         Thread preferredNB = new Thread(new PreferredNBUpdate(process.inputPeer, 3, 6));
         preferredNB.start();
 
-//        Thread optimisticNB = new Thread(new OptimisticNBUpdate(process.inputPeer, 6));
-//        optimisticNB.start();
+        Thread optimisticNB = new Thread(new OptimisticNBUpdate(process.inputPeer, 6));
+        optimisticNB.start();
 
     }
 

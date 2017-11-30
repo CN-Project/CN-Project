@@ -25,22 +25,23 @@ public class OptimisticNBUpdate implements Runnable {
         }
     }
     private void updateOptimisticNB(){
-        Set<String> unchokedList = this.peer.getUnchokedList();
+        Set<String> chokedList = this.peer.getChokedList();
         Set<String> interestList = this.peer.getInterestedList();
 
-        ArrayList<String> chokedList = new ArrayList<>();
+        ArrayList<String> chokedInterestedList = new ArrayList<>();
 
         for (String peerid: interestList){
-            if(!unchokedList.contains(peerid)){
-                chokedList.add(peerid);
+            if(chokedList.contains(peerid)){
+                chokedInterestedList.add(peerid);
             }
         }
 
-        if (chokedList.size() > 0){
+        if (chokedInterestedList.size() > 0){
             Random random = new Random();
-            int unchokedIndex = random.nextInt(chokedList.size());
-
-            peer.getClientThreadMap().get(chokedList.get(unchokedIndex)).sendActualMsg(new UnChokeMsg());
+            int unchokedIndex = random.nextInt(chokedInterestedList.size());
+            peer.getClientThreadMap().get(chokedInterestedList.get(unchokedIndex)).sendActualMsg(new UnChokeMsg());
+            this.peer.addUnchokedList(chokedInterestedList.get(unchokedIndex));
+            this.peer.removeFromchokedList(chokedInterestedList.get(unchokedIndex));
         }
     }
 }
