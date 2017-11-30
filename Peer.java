@@ -4,10 +4,7 @@ import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.time.Period;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -46,19 +43,19 @@ public class Peer {
     private Map<String, Integer> downloadRateMap = new ConcurrentHashMap<>();
 
     /** Every peer will keep the unchoked list for preferred neighbor. */
-    private Set<String> unchokedList = new HashSet<>();
+    private Set<String> unchokedList = Collections.synchronizedSet(new HashSet<>());
 
     /** List that stores all choked peers. */
-    private Set<String> chokedList = new HashSet<>();
+    private Set<String> chokedList = Collections.synchronizedSet(new HashSet<>());
 
     /** A peer will keep its own bitfield info and neighbors' bitfield info, and its interested list */
-    private Set<String> interestedList = new HashSet<>();
+    private Set<String> interestedList = Collections.synchronizedSet(new HashSet<>());
 
     /** all peers provided by the cfg file*/
     private Map<String, Peer> peerList = new ConcurrentHashMap<>();
 
     /** all peers connecting to the current peer*/
-    private Set<String> connectedList = new HashSet<>();
+    private Set<String> connectedList = Collections.synchronizedSet(new HashSet<>());
 
     // Empty constructor
     public Peer(){}
