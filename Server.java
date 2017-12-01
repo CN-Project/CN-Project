@@ -33,7 +33,7 @@ public class Server extends Thread{
         {
             System.out.println("The server is running.");
             ServerSocket serverSocket = new ServerSocket(Integer.parseInt(this.linsteningPort), 0);
-            serverSocket.setSoTimeout(100000);
+            serverSocket.setSoTimeout(100000000);
             while(true)
             {
                 Socket socket = null;

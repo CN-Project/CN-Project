@@ -1,6 +1,7 @@
 import Msg.ChokeMsg;
 import Msg.UnChokeMsg;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class PreferredNBUpdate implements Runnable {
@@ -35,6 +36,9 @@ public class PreferredNBUpdate implements Runnable {
         Set<String> unchokedList = new HashSet<>();
         Set<String> chokedList = new HashSet<>();
         Map<String, Client> neighborClients = peer.getClientThreadMap();
+        SimpleDateFormat dateFormat = new SimpleDateFormat();
+        String time = dateFormat.format(new Date());
+        String logContent;
 
         for (String peerid: interestedList){
             if(downloadMap.containsKey(peerid)){
@@ -91,5 +95,7 @@ public class PreferredNBUpdate implements Runnable {
 
         peer.setChokedList(currentChokedList);
         peer.setUnchokedList(currentUnchokedList);
+        logContent = "[ " + time + " ]: Peer " + this.peer.getPeerId() + " has the preferred neighbors" + currentUnchokedList.toString() + ".";
+        this.peer.writeLog(logContent);
     }
 }

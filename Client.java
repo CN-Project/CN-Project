@@ -50,12 +50,20 @@ public class Client extends Thread{
     public synchronized void run(){
         try{
             //initialize Socket of client
-            requestSocket = new Socket(serverPeerAddr, Integer.parseInt(this.listeningPort));
-            System.out.println("\n" + "{Client} connect to localhost at port " + this.listeningPort);
-            //initialize outputstream and inputstream
-            out = new ObjectOutputStream(requestSocket.getOutputStream());
-            out.flush();
-            in = new ObjectInputStream(requestSocket.getInputStream());
+            requestSocket = new Socket();
+            while(true){
+                try{
+                    requestSocket.connect(new InetSocketAddress(serverPeerAddr, Integer.parseInt(this.listeningPort)), 1000000);
+                    System.out.println("\n" + "{Client} connect to localhost at port " + this.listeningPort);
+
+                    out = new ObjectOutputStream(requestSocket.getOutputStream());
+                    in = new ObjectInputStream(requestSocket.getInputStream());
+                    break;
+                }
+                catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
 
             // 1. send handshake to server
             sentHandShakeMsg.setPeerID(clientPeerID);

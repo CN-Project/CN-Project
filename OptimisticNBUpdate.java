@@ -1,5 +1,6 @@
 import Msg.UnChokeMsg;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class OptimisticNBUpdate implements Runnable {
@@ -30,6 +31,10 @@ public class OptimisticNBUpdate implements Runnable {
 
         ArrayList<String> chokedInterestedList = new ArrayList<>();
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat();
+        String time = dateFormat.format(new Date());
+        String logContent;
+
         for (String peerid: interestList){
             if(chokedList.contains(peerid)){
                 chokedInterestedList.add(peerid);
@@ -42,6 +47,8 @@ public class OptimisticNBUpdate implements Runnable {
             peer.getClientThreadMap().get(chokedInterestedList.get(unchokedIndex)).sendActualMsg(new UnChokeMsg());
             this.peer.addUnchokedList(chokedInterestedList.get(unchokedIndex));
             this.peer.removeFromchokedList(chokedInterestedList.get(unchokedIndex));
+            logContent = "[ " + time + " ]: Peer " + this.peer.getPeerId() + " has the optimistically unchoked neighbor" + unchokedIndex + ".";
+            this.peer.writeLog(logContent);
         }
     }
 }
