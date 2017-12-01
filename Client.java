@@ -174,15 +174,16 @@ public class Client extends Thread{
 //                out = new ObjectOutputStream(requestSocket.getOutputStream());
 //            }
             out.writeObject(actualMsg);
-            System.out.println(actualMsg);
             out.flush();
+            System.out.println(actualMsg);
         }
         catch (IOException ioException){
             try{
                 requestSocket = new Socket(this.serverPeerAddr, Integer.parseInt(this.listeningPort));
                 out = new ObjectOutputStream(requestSocket.getOutputStream());
-                System.out.println(actualMsg);
+                out.writeObject(actualMsg);
                 out.flush();
+                System.out.println(actualMsg);
             }
             catch(Exception e){
                 System.out.println("problem still");

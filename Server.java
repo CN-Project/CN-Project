@@ -32,10 +32,12 @@ public class Server extends Thread{
         try
         {
             System.out.println("The server is running.");
-            ServerSocket serverSocket = new ServerSocket(Integer.parseInt(this.linsteningPort));
+            ServerSocket serverSocket = new ServerSocket(Integer.parseInt(this.linsteningPort), 0);
+            serverSocket.setSoTimeout(100000);
             while(true)
             {
-                Socket socket = serverSocket.accept();
+                Socket socket = null;
+                socket = serverSocket.accept();
                 new Handler(socket, this.serverPeer).start();
                 System.out.println("Client is connected!");
             }
@@ -79,32 +81,12 @@ public class Server extends Thread{
                     out.flush();
                     in = new ObjectInputStream(socket.getInputStream());
                 }catch(IOException ioe){
-                    try{
-                        this.socket = new ServerSocket(Integer.parseInt(this.serverPeer.getListeningPort())).accept();
-                        out = new ObjectOutputStream(socket.getOutputStream());
-                        out.flush();
-                        in = new ObjectInputStream(socket.getInputStream());
-                    }
-                    catch(Exception e){
-                        System.out.println("problem still");
-                    }
+                    ioe.printStackTrace();
                 }
 
                 try {
                     while (true){
-                        Object readObject = null;
-                        try{
-                            readObject = in.readObject();
-                        }catch(IOException ioe){
-                            try{
-                                this.socket = new ServerSocket(Integer.parseInt(this.serverPeer.getListeningPort())).accept();
-                                in = new ObjectInputStream(socket.getInputStream());
-                            }
-                            catch(Exception e){
-                                System.out.println("problem still");
-                            }
-                        }
-
+                        Object readObject = in.readObject();
                         System.out.println("{Server} Receive: " + readObject.getClass().getName());
                         MsgType = readObject.getClass().getName();
                         SimpleDateFormat dateFormat = new SimpleDateFormat();
